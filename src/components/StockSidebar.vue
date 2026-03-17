@@ -1,8 +1,5 @@
 <template>
   <div class="stock-sidebar" :class="{ collapsed }">
-    <button class="toggle-btn" @click="emit('toggle')">
-      {{ collapsed ? "«" : "»" }}
-    </button>
     <div class="sidebar-content" v-show="!collapsed">
       <div class="sidebar-header">
         <h3>股票信息</h3>
@@ -41,7 +38,7 @@
               <span class="value">{{ formattedUnitPrice }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">总库存</span>
+              <span class="label">总股数</span>
               <span class="value">{{ totalStock }}</span>
             </div>
             <div class="detail-item">
@@ -68,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, defineProps, defineEmits } from "vue";
+import { computed, onMounted } from "vue";
 import {
   stockData,
   historyData,

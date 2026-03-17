@@ -77,7 +77,7 @@ function formatCurrency(amount: number): string {
 }
 
 function connectWebSocket() {
-  ws = new WebSocket('ws://localhost:3000');
+  ws = new WebSocket('ws://felinus.gnway.cc:8000');
 
   ws.onopen = () => {
     console.log('WebSocket连接已建立');
@@ -114,6 +114,26 @@ function handleWebSocketMessage(message: any) {
       Object.assign(stockData, message.data);
       stockData.lastUpdated = new Date().toLocaleString();
       currentDiskId.value = message.diskId;
+      if (message.data && message.data.timestamp) {
+        historyData.value.push({
+          ...message.data,
+          timestamp: message.data.timestamp
+        });
+        const time = new Date(message.data.timestamp).toTimeString().split(' ')[0];
+        const prevItem = historyData.value[historyData.value.length - 2];
+        const open = prevItem ? prevItem.unitPrice : message.data.unitPrice;
+        const close = message.data.unitPrice;
+        const high = Math.max(open, close);
+        const low = Math.min(open, close);
+        klineData.value.push([
+          time,
+          open,
+          close,
+          low,
+          high,
+          message.data.totalStock
+        ]);
+      }
       break;
     case 'disks_update':
       diskList.value = message.data;
@@ -150,7 +170,7 @@ async function loadStockData() {
   error.value = null;
 
   try {
-    const response = await fetch('http://localhost:3000/stock/latest');
+    const response = await fetch('http://felinus.gnway.cc:8000/stock/latest');
     const data = await response.json();
 
     if (data.success && data.data) {
@@ -173,7 +193,7 @@ async function loadHistoryData() {
   historyError.value = null;
 
   try {
-    const response = await fetch('http://localhost:3000/stock');
+    const response = await fetch('http://felinus.gnway.cc:8000/stock');
     const data = await response.json();
 
     if (data.success && Array.isArray(data.data)) {
@@ -195,7 +215,7 @@ async function loadKlineData() {
   klineError.value = null;
 
   try {
-    const response = await fetch('http://localhost:3000/stock/kline');
+    const response = await fetch('http://felinus.gnway.cc:8000/stock/kline');
     const data = await response.json();
 
     if (data.success && Array.isArray(data.data)) {
@@ -217,7 +237,7 @@ async function loadDiskList() {
   diskError.value = null;
 
   try {
-    const response = await fetch('http://localhost:3000/disks');
+    const response = await fetch('http://felinus.gnway.cc:8000/disks');
     const data = await response.json();
 
     if (data.success && Array.isArray(data.data)) {
@@ -239,7 +259,7 @@ async function loadDiskData(diskId: number) {
   diskError.value = null;
 
   try {
-    const response = await fetch(`http://localhost:3000/disks/${diskId}`);
+    const response = await fetch(`http://felinus.gnway.cc:8000/disks/${diskId}`);
     const data = await response.json();
 
     if (data.success && Array.isArray(data.data)) {
@@ -261,7 +281,7 @@ async function loadDiskKline(diskId: number) {
   klineError.value = null;
 
   try {
-    const response = await fetch(`http://localhost:3000/disks/${diskId}/kline`);
+    const response = await fetch(`http://felinus.gnway.cc:8000/disks/${diskId}/kline`);
     const data = await response.json();
 
     if (data.success && Array.isArray(data.data)) {

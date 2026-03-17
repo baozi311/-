@@ -203,11 +203,13 @@ function closeCurrentDisk() {
         lowPrice: currentDisk.lowPrice
       }
     })
+
+    // 封盘后检查是否需要清理数据
+    setTimeout(() => {
+      checkAndClearOldData()
+    }, 100)
   }
 }
-
-// 初始化：加载数据或创建第一盘
-loadData()
 
 // 检查是否需要清理（每天凌晨3点后，如果当前盘最后数据是昨天的，清理所有数据）
 function checkAndClearOldData() {
@@ -216,7 +218,16 @@ function checkAndClearOldData() {
 
   // 只在凌晨3点之后检查
   if (now.getHours() < resetHour) {
-    return
+    return false
+  }
+
+  // 检查当前盘是否已封盘
+  const isCurrentDiskClosed = currentDisk && currentDisk.isClosed === true
+
+  // 如果当前盘未封盘，不清理，等待封盘后再处理
+  if (currentDisk && !isCurrentDiskClosed) {
+    console.log('当前盘尚未封盘，推迟清理...')
+    return false
   }
 
   if (currentDisk && currentDisk.data.length > 0) {
@@ -226,7 +237,7 @@ function checkAndClearOldData() {
 
     // 如果最后数据是昨天的，清理所有数据
     if (lastDataDate.getTime() < today.getTime()) {
-      console.log('检测到新的一天（凌晨3点后），清理所有历史数据...')
+      console.log('检测到新的一天（凌晨3点后），且当前盘已封盘，清理所有历史数据...')
       // 清理所有数据
       stockDisks = []
       currentDisk = null
@@ -235,11 +246,42 @@ function checkAndClearOldData() {
         ...CRASH_DATA,
         timestamp: new Date().toISOString()
       })
+      return true
     }
   }
+  return false
 }
 
+// 每天凌晨3点检查并清理数据
+function scheduleDailyClear() {
+  const now = new Date()
+  const resetHour = 3
+  const resetMinute = 0
+  
+  let nextClear = new Date(now)
+  nextClear.setHours(resetHour, resetMinute, 0, 0)
+  
+  // 如果已经过了3点，设置到明天3点
+  if (now.getHours() >= resetHour) {
+    nextClear.setDate(nextClear.getDate() + 1)
+  }
+  
+  const msUntilNextClear = nextClear.getTime() - now.getTime()
+  
+  console.log(`定时清理已设置，将在 ${nextClear.toLocaleString()} 执行（${Math.round(msUntilNextClear / 1000 / 60)} 分钟后）`)
+  
+  setTimeout(() => {
+    checkAndClearOldData()
+    // 然后每天3点执行一次
+    setInterval(() => {
+      checkAndClearOldData()
+    }, 24 * 60 * 60 * 1000) // 24小时
+  }, msUntilNextClear)
+}
+
+loadData()
 checkAndClearOldData()
+scheduleDailyClear()
 
 if (stockDisks.length === 0 || !currentDisk) {
   createNewDisk({
@@ -248,8 +290,8 @@ if (stockDisks.length === 0 || !currentDisk) {
   })
 }
 
-// 生成K线图数据（滚动计算方式）
-function generateKLineData(diskData, intervalMinutes = 2) {
+// 生成K线图数据（每个数据点作为一个K线）
+function generateKLineData(diskData) {
   if (!diskData || diskData.length === 0) {
     return []
   }
@@ -258,39 +300,43 @@ function generateKLineData(diskData, intervalMinutes = 2) {
     new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
   )
 
-  const grouped = new Map()
+  const klineData = []
 
-  for (const item of sortedData) {
+  for (let i = 0; i < sortedData.length; i++) {
+    const item = sortedData[i]
     const date = new Date(item.timestamp)
-    const minutes = Math.floor(date.getMinutes() / intervalMinutes) * intervalMinutes
-    const timeKey = `${date.getHours().toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`
+    const time = date.toTimeString().split(' ')[0]
 
-    if (!grouped.has(timeKey)) {
-      grouped.set(timeKey, {
-        open: item.unitPrice,
-        high: item.unitPrice,
-        low: item.unitPrice,
-        close: item.unitPrice,
-        volume: item.totalStock,
-        timestamp: item.timestamp
-      })
+    // 使用当前价格和前一个价格计算K线
+    let open, close, high, low
+
+    if (i === 0) {
+      // 第一个数据点
+      open = item.unitPrice
+      close = item.unitPrice
+      high = item.unitPrice
+      low = item.unitPrice
     } else {
-      const existing = grouped.get(timeKey)
-      existing.high = Math.max(existing.high, item.unitPrice)
-      existing.low = Math.min(existing.low, item.unitPrice)
-      existing.close = item.unitPrice
-      existing.volume += item.totalStock
+      const prevItem = sortedData[i - 1]
+      // O = 前一个价格, C = 当前价格
+      open = prevItem.unitPrice
+      close = item.unitPrice
+      // H = max(前一个, 当前), L = min(前一个, 当前)
+      high = Math.max(open, close)
+      low = Math.min(open, close)
     }
+
+    klineData.push([
+      time,
+      open,     // 开盘
+      close,    // 收盘
+      low,      // 最低
+      high,     // 最高
+      item.totalStock  // 成交量
+    ])
   }
 
-  return Array.from(grouped.entries()).map(([time, data]) => [
-    time,
-    data.open,
-    data.close,
-    data.low,
-    data.high,
-    data.volume
-  ])
+  return klineData
 }
 
 // 根路径

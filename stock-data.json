@@ -4965,8 +4965,976 @@
           "timestamp": "2026-03-17T03:37:56.811Z"
         }
       ],
+      "isClosed": true,
+      "endTime": "2026-03-17T03:39:57.131Z",
+      "highPrice": 85.7009,
+      "lowPrice": 0.0169
+    },
+    {
+      "id": 38,
+      "startTime": "2026-03-17T03:39:57.137Z",
+      "data": [
+        {
+          "unitPrice": 1,
+          "totalStock": 1000,
+          "personalStock": 0,
+          "totalMoney": 1000,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T03:39:57.136Z"
+        },
+        {
+          "unitPrice": 1.51,
+          "totalStock": 1000,
+          "personalStock": 0,
+          "totalMoney": 1510,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T03:41:57.348Z"
+        },
+        {
+          "unitPrice": 1.2382,
+          "totalStock": 1006,
+          "personalStock": 0,
+          "totalMoney": 1245.6292,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T03:43:56.941Z"
+        },
+        {
+          "unitPrice": 0.7182,
+          "totalStock": 1205,
+          "personalStock": 0,
+          "totalMoney": 865.378,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T03:45:56.850Z"
+        },
+        {
+          "unitPrice": 0.9264,
+          "totalStock": 4856,
+          "personalStock": 0,
+          "totalMoney": 4498.7015,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T03:47:56.987Z"
+        },
+        {
+          "unitPrice": 0.0185,
+          "totalStock": 1616,
+          "personalStock": 0,
+          "totalMoney": 29.9419,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T03:49:57.736Z"
+        }
+      ],
+      "isClosed": true,
+      "endTime": "2026-03-17T03:51:57.259Z",
+      "highPrice": 1.51,
+      "lowPrice": 0.0185
+    },
+    {
+      "id": 39,
+      "startTime": "2026-03-17T03:51:57.262Z",
+      "data": [
+        {
+          "unitPrice": 1,
+          "totalStock": 1000,
+          "personalStock": 0,
+          "totalMoney": 1000,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T03:51:57.261Z"
+        },
+        {
+          "unitPrice": 0.38,
+          "totalStock": 1001,
+          "personalStock": 0,
+          "totalMoney": 380.38,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T03:53:57.712Z"
+        },
+        {
+          "unitPrice": 0.3458,
+          "totalStock": 5001,
+          "personalStock": 0,
+          "totalMoney": 1729.3458,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T03:55:57.395Z"
+        },
+        {
+          "unitPrice": 0.6259,
+          "totalStock": 6254,
+          "personalStock": 0,
+          "totalMoney": 3914.3661,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T03:57:57.605Z"
+        },
+        {
+          "unitPrice": 0.5764,
+          "totalStock": 1010,
+          "personalStock": 0,
+          "totalMoney": 582.157,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T03:59:57.387Z"
+        },
+        {
+          "unitPrice": 0.4081,
+          "totalStock": 1010,
+          "personalStock": 0,
+          "totalMoney": 412.157,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:01:57.494Z"
+        },
+        {
+          "unitPrice": 1.22,
+          "totalStock": 1010,
+          "personalStock": 0,
+          "totalMoney": 1232.157,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:03:58.837Z"
+        },
+        {
+          "unitPrice": 1.5127,
+          "totalStock": 1003,
+          "personalStock": 0,
+          "totalMoney": 1517.2854,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:05:57.763Z"
+        },
+        {
+          "unitPrice": 0.121,
+          "totalStock": 1404,
+          "personalStock": 0,
+          "totalMoney": 169.9118,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:07:57.958Z"
+        }
+      ],
+      "isClosed": true,
+      "endTime": "2026-03-17T04:09:57.998Z",
+      "highPrice": 1.5127,
+      "lowPrice": 0.121
+    },
+    {
+      "id": 40,
+      "startTime": "2026-03-17T04:09:58.000Z",
+      "data": [
+        {
+          "unitPrice": 1,
+          "totalStock": 1000,
+          "personalStock": 0,
+          "totalMoney": 1000,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:09:58.000Z"
+        },
+        {
+          "unitPrice": 1.84,
+          "totalStock": 31210,
+          "personalStock": 0,
+          "totalMoney": 57426.4,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:11:58.057Z"
+        },
+        {
+          "unitPrice": 1.6192,
+          "totalStock": 1001,
+          "personalStock": 0,
+          "totalMoney": 1620.8192,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:13:57.989Z"
+        },
+        {
+          "unitPrice": 0.5667,
+          "totalStock": 1001,
+          "personalStock": 0,
+          "totalMoney": 567.2867,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:15:58.655Z"
+        },
+        {
+          "unitPrice": 1.1108,
+          "totalStock": 2001,
+          "personalStock": 0,
+          "totalMoney": 2222.6532,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:17:59.086Z"
+        },
+        {
+          "unitPrice": 1.0219,
+          "totalStock": 1001,
+          "personalStock": 0,
+          "totalMoney": 1022.9314,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:19:58.887Z"
+        },
+        {
+          "unitPrice": 0.746,
+          "totalStock": 1151,
+          "personalStock": 0,
+          "totalMoney": 858.639,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:21:59.115Z"
+        },
+        {
+          "unitPrice": 1.1041,
+          "totalStock": 2551,
+          "personalStock": 0,
+          "totalMoney": 2816.4852,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:23:59.826Z"
+        },
+        {
+          "unitPrice": 0.9495,
+          "totalStock": 1101,
+          "personalStock": 0,
+          "totalMoney": 1045.4007,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:25:59.359Z"
+        },
+        {
+          "unitPrice": 0.5317,
+          "totalStock": 2512,
+          "personalStock": 0,
+          "totalMoney": 1335.6822,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:27:59.475Z"
+        },
+        {
+          "unitPrice": 0.5636,
+          "totalStock": 10032,
+          "personalStock": 0,
+          "totalMoney": 5654.2744,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:29:59.633Z"
+        },
+        {
+          "unitPrice": 0.6313,
+          "totalStock": 2561,
+          "personalStock": 0,
+          "totalMoney": 1616.6535,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:31:59.900Z"
+        },
+        {
+          "unitPrice": 0.9216,
+          "totalStock": 2061,
+          "personalStock": 0,
+          "totalMoney": 1899.4953,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:34:00.201Z"
+        },
+        {
+          "unitPrice": 0.7465,
+          "totalStock": 1502,
+          "personalStock": 0,
+          "totalMoney": 1121.2829,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:35:59.594Z"
+        },
+        {
+          "unitPrice": 0.4778,
+          "totalStock": 2602,
+          "personalStock": 0,
+          "totalMoney": 1243.1757,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:37:59.672Z"
+        },
+        {
+          "unitPrice": 0.1481,
+          "totalStock": 2220,
+          "personalStock": 0,
+          "totalMoney": 328.8061,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:40:00.004Z"
+        }
+      ],
+      "isClosed": true,
+      "endTime": "2026-03-17T04:42:01.582Z",
+      "highPrice": 1.84,
+      "lowPrice": 0.1481
+    },
+    {
+      "id": 41,
+      "startTime": "2026-03-17T04:42:01.584Z",
+      "data": [
+        {
+          "unitPrice": 1,
+          "totalStock": 1000,
+          "personalStock": 0,
+          "totalMoney": 1000,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:42:01.584Z"
+        },
+        {
+          "unitPrice": 0.5,
+          "totalStock": 1400,
+          "personalStock": 0,
+          "totalMoney": 700,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:43:59.788Z"
+        },
+        {
+          "unitPrice": 0.67,
+          "totalStock": 3933,
+          "personalStock": 0,
+          "totalMoney": 2635.11,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:46:00.099Z"
+        },
+        {
+          "unitPrice": 0.6553,
+          "totalStock": 1356,
+          "personalStock": 0,
+          "totalMoney": 888.52,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:47:59.999Z"
+        },
+        {
+          "unitPrice": 0.5474,
+          "totalStock": 2408,
+          "personalStock": 0,
+          "totalMoney": 1318.0991,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:54:00.761Z"
+        },
+        {
+          "unitPrice": 0.6923,
+          "totalStock": 3518,
+          "personalStock": 0,
+          "totalMoney": 2435.5497,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:56:00.563Z"
+        },
+        {
+          "unitPrice": 1.0249,
+          "totalStock": 1413,
+          "personalStock": 0,
+          "totalMoney": 1448.2353,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T04:58:01.879Z"
+        },
+        {
+          "unitPrice": 1.8244,
+          "totalStock": 1121,
+          "personalStock": 0,
+          "totalMoney": 2045.1378,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:00:00.940Z"
+        },
+        {
+          "unitPrice": 1.6602,
+          "totalStock": 1071,
+          "personalStock": 0,
+          "totalMoney": 1778.0658,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:02:01.162Z"
+        },
+        {
+          "unitPrice": 2.5567,
+          "totalStock": 1221,
+          "personalStock": 0,
+          "totalMoney": 3121.7257,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:04:01.298Z"
+        },
+        {
+          "unitPrice": 4.4231,
+          "totalStock": 1117,
+          "personalStock": 0,
+          "totalMoney": 4940.5848,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:06:00.658Z"
+        },
+        {
+          "unitPrice": 4.9096,
+          "totalStock": 1159,
+          "personalStock": 0,
+          "totalMoney": 5690.2533,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:08:00.999Z"
+        },
+        {
+          "unitPrice": 3.5349,
+          "totalStock": 1109,
+          "personalStock": 0,
+          "totalMoney": 3920.2359,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:10:01.046Z"
+        },
+        {
+          "unitPrice": 4.7368,
+          "totalStock": 1141,
+          "personalStock": 0,
+          "totalMoney": 5404.6939,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:12:00.874Z"
+        },
+        {
+          "unitPrice": 7.2947,
+          "totalStock": 1054,
+          "personalStock": 0,
+          "totalMoney": 7688.5916,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:14:01.257Z"
+        },
+        {
+          "unitPrice": 3.5014,
+          "totalStock": 1210,
+          "personalStock": 0,
+          "totalMoney": 4236.7495,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:16:01.522Z"
+        },
+        {
+          "unitPrice": 3.6065,
+          "totalStock": 1076,
+          "personalStock": 0,
+          "totalMoney": 3880.5824,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:18:01.629Z"
+        },
+        {
+          "unitPrice": 2.1639,
+          "totalStock": 1238,
+          "personalStock": 0,
+          "totalMoney": 2678.9002,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:20:01.534Z"
+        },
+        {
+          "unitPrice": 0.9521,
+          "totalStock": 1093,
+          "personalStock": 0,
+          "totalMoney": 1040.6597,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:22:01.506Z"
+        },
+        {
+          "unitPrice": 0.9426,
+          "totalStock": 1304,
+          "personalStock": 0,
+          "totalMoney": 1229.14,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:24:02.102Z"
+        },
+        {
+          "unitPrice": 1.6307,
+          "totalStock": 3534,
+          "personalStock": 0,
+          "totalMoney": 5762.838,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:26:02.031Z"
+        },
+        {
+          "unitPrice": 1.2067,
+          "totalStock": 1395,
+          "personalStock": 0,
+          "totalMoney": 1683.3553,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:28:01.837Z"
+        },
+        {
+          "unitPrice": 1.8825,
+          "totalStock": 1320,
+          "personalStock": 0,
+          "totalMoney": 2484.8496,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:30:02.592Z"
+        },
+        {
+          "unitPrice": 0.3953,
+          "totalStock": 1850,
+          "personalStock": 0,
+          "totalMoney": 731.3364,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:32:01.928Z"
+        },
+        {
+          "unitPrice": 0.2656,
+          "totalStock": 1696,
+          "personalStock": 0,
+          "totalMoney": 450.4576,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:34:01.808Z"
+        },
+        {
+          "unitPrice": 0.2656,
+          "totalStock": 5200,
+          "personalStock": 0,
+          "totalMoney": 1381.12,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:35:18.936Z"
+        },
+        {
+          "unitPrice": 0.4196,
+          "totalStock": 5466,
+          "personalStock": 0,
+          "totalMoney": 2293.796,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:36:02.138Z"
+        },
+        {
+          "unitPrice": 0.4196,
+          "totalStock": 1767,
+          "personalStock": 0,
+          "totalMoney": 741.518,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:37:58.871Z"
+        },
+        {
+          "unitPrice": 0.8159,
+          "totalStock": 1817,
+          "personalStock": 0,
+          "totalMoney": 1482.5004,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:38:02.452Z"
+        },
+        {
+          "unitPrice": 0.8159,
+          "totalStock": 1516,
+          "personalStock": 0,
+          "totalMoney": 1236.9129,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:38:38.192Z"
+        },
+        {
+          "unitPrice": 0.8159,
+          "totalStock": 1216,
+          "personalStock": 0,
+          "totalMoney": 992.1412,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:39:47.083Z"
+        },
+        {
+          "unitPrice": 1.112,
+          "totalStock": 1216,
+          "personalStock": 0,
+          "totalMoney": 1352.1412,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:40:02.267Z"
+        },
+        {
+          "unitPrice": 1.5901,
+          "totalStock": 1139,
+          "personalStock": 0,
+          "totalMoney": 1811.1242,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:42:04.200Z"
+        },
+        {
+          "unitPrice": 2.0671,
+          "totalStock": 1996,
+          "personalStock": 0,
+          "totalMoney": 4125.9921,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:44:02.767Z"
+        },
+        {
+          "unitPrice": 1.8191,
+          "totalStock": 1079,
+          "personalStock": 0,
+          "totalMoney": 1962.7816,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:46:02.445Z"
+        },
+        {
+          "unitPrice": 0.0728,
+          "totalStock": 1189,
+          "personalStock": 0,
+          "totalMoney": 86.5152,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:48:03.093Z"
+        },
+        {
+          "unitPrice": 0.2578,
+          "totalStock": 1189,
+          "personalStock": 0,
+          "totalMoney": 306.5152,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:50:03.413Z"
+        },
+        {
+          "unitPrice": 0.3507,
+          "totalStock": 3228,
+          "personalStock": 0,
+          "totalMoney": 1132.1539,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:52:02.524Z"
+        },
+        {
+          "unitPrice": 0.5227,
+          "totalStock": 1454,
+          "personalStock": 0,
+          "totalMoney": 759.9603,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:54:03.151Z"
+        }
+      ],
+      "isClosed": true,
+      "endTime": "2026-03-17T05:56:02.816Z",
+      "highPrice": 7.2947,
+      "lowPrice": 0.0728
+    },
+    {
+      "id": 42,
+      "startTime": "2026-03-17T05:56:02.819Z",
+      "data": [
+        {
+          "unitPrice": 1,
+          "totalStock": 1000,
+          "personalStock": 0,
+          "totalMoney": 1000,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:56:02.819Z"
+        },
+        {
+          "unitPrice": 0.9,
+          "totalStock": 1500,
+          "personalStock": 0,
+          "totalMoney": 1350,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T05:58:03.065Z"
+        },
+        {
+          "unitPrice": 0.657,
+          "totalStock": 2847,
+          "personalStock": 0,
+          "totalMoney": 1870.479,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:00:02.812Z"
+        },
+        {
+          "unitPrice": 0.0526,
+          "totalStock": 5238,
+          "personalStock": 0,
+          "totalMoney": 275.3093,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:02:02.936Z"
+        }
+      ],
+      "isClosed": true,
+      "endTime": "2026-03-17T06:04:02.955Z",
+      "highPrice": 1,
+      "lowPrice": 0.0526
+    },
+    {
+      "id": 43,
+      "startTime": "2026-03-17T06:04:02.957Z",
+      "data": [
+        {
+          "unitPrice": 1,
+          "totalStock": 1000,
+          "personalStock": 0,
+          "totalMoney": 1000,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:04:02.957Z"
+        },
+        {
+          "unitPrice": 0.59,
+          "totalStock": 60947,
+          "personalStock": 0,
+          "totalMoney": 35958.73,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:06:02.916Z"
+        },
+        {
+          "unitPrice": 0.59,
+          "totalStock": 76700,
+          "personalStock": 0,
+          "totalMoney": 45253,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:08:02.920Z"
+        },
+        {
+          "unitPrice": 0.0708,
+          "totalStock": 76900,
+          "personalStock": 0,
+          "totalMoney": 5444.52,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:10:03.034Z"
+        },
+        {
+          "unitPrice": 0.0163,
+          "totalStock": 76900,
+          "personalStock": 0,
+          "totalMoney": 1252.2396,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:12:03.939Z"
+        },
+        {
+          "unitPrice": 0.0298,
+          "totalStock": 76900,
+          "personalStock": 0,
+          "totalMoney": 2291.5985,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:14:03.708Z"
+        },
+        {
+          "unitPrice": 0.0384,
+          "totalStock": 76900,
+          "personalStock": 0,
+          "totalMoney": 2956.162,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:16:03.739Z"
+        },
+        {
+          "unitPrice": 0.0227,
+          "totalStock": 76900,
+          "personalStock": 0,
+          "totalMoney": 1744.1356,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:18:03.696Z"
+        },
+        {
+          "unitPrice": 0.0209,
+          "totalStock": 63300,
+          "personalStock": 0,
+          "totalMoney": 1320.8255,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:20:04.139Z"
+        },
+        {
+          "unitPrice": 0.0365,
+          "totalStock": 63300,
+          "personalStock": 0,
+          "totalMoney": 2311.4446,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:22:03.870Z"
+        },
+        {
+          "unitPrice": 0.0716,
+          "totalStock": 62357,
+          "personalStock": 0,
+          "totalMoney": 4462.9402,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:24:04.564Z"
+        },
+        {
+          "unitPrice": 0.0361,
+          "totalStock": 11572,
+          "personalStock": 0,
+          "totalMoney": 418.2173,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:26:04.236Z"
+        },
+        {
+          "unitPrice": 0.0534,
+          "totalStock": 11572,
+          "personalStock": 0,
+          "totalMoney": 618.2173,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:28:05.027Z"
+        },
+        {
+          "unitPrice": 0.0802,
+          "totalStock": 11572,
+          "personalStock": 0,
+          "totalMoney": 928.2173,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:30:04.149Z"
+        },
+        {
+          "unitPrice": 0.1251,
+          "totalStock": 11572,
+          "personalStock": 0,
+          "totalMoney": 1448.2173,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:32:04.212Z"
+        },
+        {
+          "unitPrice": 0.1039,
+          "totalStock": 16247,
+          "personalStock": 0,
+          "totalMoney": 1687.6274,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:34:04.233Z"
+        },
+        {
+          "unitPrice": 0.5776,
+          "totalStock": 1752,
+          "personalStock": 0,
+          "totalMoney": 1011.9858,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:36:04.456Z"
+        },
+        {
+          "unitPrice": 1.0282,
+          "totalStock": 4294,
+          "personalStock": 0,
+          "totalMoney": 4414.9151,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:38:05.239Z"
+        },
+        {
+          "unitPrice": 1.8301,
+          "totalStock": 1844,
+          "personalStock": 0,
+          "totalMoney": 3374.7471,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:40:04.776Z"
+        },
+        {
+          "unitPrice": 2.5073,
+          "totalStock": 1514,
+          "personalStock": 0,
+          "totalMoney": 3796.0049,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:42:04.467Z"
+        },
+        {
+          "unitPrice": 4.137,
+          "totalStock": 2316,
+          "personalStock": 0,
+          "totalMoney": 9581.2768,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:44:04.569Z"
+        },
+        {
+          "unitPrice": 3.5578,
+          "totalStock": 1165,
+          "personalStock": 0,
+          "totalMoney": 4144.8537,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:46:04.747Z"
+        },
+        {
+          "unitPrice": 0.9962,
+          "totalStock": 1525,
+          "personalStock": 0,
+          "totalMoney": 1519.1867,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:48:04.987Z"
+        },
+        {
+          "unitPrice": 0.4284,
+          "totalStock": 3462,
+          "personalStock": 0,
+          "totalMoney": 1482.9853,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:50:05.028Z"
+        },
+        {
+          "unitPrice": 0.5526,
+          "totalStock": 10486,
+          "personalStock": 0,
+          "totalMoney": 5794.4115,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:52:06.262Z"
+        },
+        {
+          "unitPrice": 0.4932,
+          "totalStock": 1685,
+          "personalStock": 0,
+          "totalMoney": 831.1066,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:54:05.337Z"
+        }
+      ],
+      "isClosed": true,
+      "endTime": "2026-03-17T06:56:05.837Z",
+      "highPrice": 4.137,
+      "lowPrice": 0.0163
+    },
+    {
+      "id": 44,
+      "startTime": "2026-03-17T06:56:05.840Z",
+      "data": [
+        {
+          "unitPrice": 1,
+          "totalStock": 1000,
+          "personalStock": 0,
+          "totalMoney": 1000,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:56:05.840Z"
+        },
+        {
+          "unitPrice": 0.51,
+          "totalStock": 202006,
+          "personalStock": 0,
+          "totalMoney": 103023.06,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T06:58:05.820Z"
+        },
+        {
+          "unitPrice": 0.6783,
+          "totalStock": 208755,
+          "personalStock": 0,
+          "totalMoney": 141598.5165,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T07:00:06.494Z"
+        },
+        {
+          "unitPrice": 0.2713,
+          "totalStock": 205421,
+          "personalStock": 0,
+          "totalMoney": 55734.8257,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T07:02:05.879Z"
+        },
+        {
+          "unitPrice": 0.0895,
+          "totalStock": 231479,
+          "personalStock": 0,
+          "totalMoney": 20725.6112,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T07:04:07.295Z"
+        },
+        {
+          "unitPrice": 0.0394,
+          "totalStock": 231479,
+          "personalStock": 0,
+          "totalMoney": 9119.2689,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T07:06:06.056Z"
+        },
+        {
+          "unitPrice": 0.0599,
+          "totalStock": 231479,
+          "personalStock": 0,
+          "totalMoney": 13861.2887,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T07:08:06.525Z"
+        },
+        {
+          "unitPrice": 0.0617,
+          "totalStock": 10732,
+          "personalStock": 0,
+          "totalMoney": 662.6473,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T07:10:08.053Z"
+        },
+        {
+          "unitPrice": 0.0906,
+          "totalStock": 10732,
+          "personalStock": 0,
+          "totalMoney": 972.6473,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T07:12:06.314Z"
+        },
+        {
+          "unitPrice": 0.0813,
+          "totalStock": 10732,
+          "personalStock": 0,
+          "totalMoney": 872.6473,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T07:14:06.583Z"
+        }
+      ],
+      "isClosed": true,
+      "endTime": "2026-03-17T07:16:08.282Z",
+      "highPrice": 1,
+      "lowPrice": 0.0394
+    },
+    {
+      "id": 45,
+      "startTime": "2026-03-17T07:16:08.285Z",
+      "data": [
+        {
+          "unitPrice": 1,
+          "totalStock": 1000,
+          "personalStock": 0,
+          "totalMoney": 1000,
+          "personalMoney": 0,
+          "timestamp": "2026-03-17T07:16:08.285Z"
+        }
+      ],
       "isClosed": false
     }
   ],
-  "currentDiskId": 37
+  "currentDiskId": 45
 }
