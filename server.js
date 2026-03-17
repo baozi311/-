@@ -248,25 +248,49 @@ if (stockDisks.length === 0 || !currentDisk) {
   })
 }
 
-// 生成K线图数据
-function generateKLineData(diskData) {
+// 生成K线图数据（滚动计算方式）
+function generateKLineData(diskData, intervalMinutes = 2) {
   if (!diskData || diskData.length === 0) {
     return []
   }
 
-  return diskData.map(item => {
-    const price = item.unitPrice
+  const sortedData = [...diskData].sort((a, b) => 
+    new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  )
+
+  const grouped = new Map()
+
+  for (const item of sortedData) {
     const date = new Date(item.timestamp)
-    const time = date.toTimeString().split(' ')[0] // 只显示时分秒 HH:MM:SS
-    return [
-      time,
-      price,
-      price,
-      price,
-      price,
-      item.totalStock
-    ]
-  })
+    const minutes = Math.floor(date.getMinutes() / intervalMinutes) * intervalMinutes
+    const timeKey = `${date.getHours().toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`
+
+    if (!grouped.has(timeKey)) {
+      grouped.set(timeKey, {
+        open: item.unitPrice,
+        high: item.unitPrice,
+        low: item.unitPrice,
+        close: item.unitPrice,
+        volume: item.totalStock,
+        timestamp: item.timestamp
+      })
+    } else {
+      const existing = grouped.get(timeKey)
+      existing.high = Math.max(existing.high, item.unitPrice)
+      existing.low = Math.min(existing.low, item.unitPrice)
+      existing.close = item.unitPrice
+      existing.volume += item.totalStock
+    }
+  }
+
+  return Array.from(grouped.entries()).map(([time, data]) => [
+    time,
+    data.open,
+    data.close,
+    data.low,
+    data.high,
+    data.volume
+  ])
 }
 
 // 根路径

@@ -5,7 +5,14 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch } from "vue";
 import * as echarts from "echarts";
-import { stockData, klineData, loadStockData, loadKlineData, klineLoading, klineError } from '../stores/stockStore';
+import {
+  stockData,
+  klineData,
+  loadStockData,
+  loadKlineData,
+  klineLoading,
+  klineError,
+} from "../stores/stockStore";
 
 const chartContainer = ref<HTMLElement | null>(null);
 let myChart: echarts.ECharts | null = null;
@@ -28,9 +35,10 @@ function splitData(rawData: (string | number)[][]) {
 
 function createOption() {
   // 使用从服务器获取的K线图数据，如果没有数据则使用模拟数据
-  const rawData = klineData.value.length > 0 ? klineData.value : generateDefaultKLineData();
+  const rawData =
+    klineData.value.length > 0 ? klineData.value : generateDefaultKLineData();
   const data = splitData(rawData);
-  
+
   return {
     backgroundColor: "#131722",
     tooltip: {
@@ -93,7 +101,7 @@ function createOption() {
     ],
     series: [
       {
-        name: "NVDA",
+        // name: "NVDA",
         type: "candlestick",
         data: data.values,
         itemStyle: {
@@ -124,29 +132,31 @@ function generateDefaultKLineData() {
   const basePrice = stockData.unitPrice || 10.5;
   const rawData: (string | number)[][] = [];
   const today = new Date();
-  
+
   // 生成过去15天的K线数据
   for (let i = 15; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(today.getDate() - i);
-    const dateStr = date.toISOString().split('T')[0];
-    
+    const dateStr = date.toISOString().split("T")[0];
+
     // 生成随机价格波动
     const open = basePrice + (Math.random() - 0.5) * 2;
     const close = open + (Math.random() - 0.5) * 3;
     const high = Math.max(open, close) + Math.random() * 1;
     const low = Math.min(open, close) - Math.random() * 1;
     const volume = 10000 + Math.floor(Math.random() * 15000);
-    
+
     rawData.push([dateStr, open, close, low, high, volume]);
   }
-  
+
   return rawData;
 }
 
 const handleResize = () => {
-  if (myChart) {
-    myChart.resize();
+  if (myChart && chartContainer.value) {
+    const width = chartContainer.value.clientWidth + 40;
+    const height = chartContainer.value.clientHeight;
+    myChart.resize({ width, height });
   }
 };
 
@@ -162,7 +172,7 @@ watch(
   () => klineData.value.length,
   () => {
     updateChart();
-  }
+  },
 );
 
 // 监听股票数据变化，更新图表
@@ -170,15 +180,17 @@ watch(
   () => stockData.unitPrice,
   () => {
     updateChart();
-  }
+  },
 );
 
 onMounted(() => {
   if (chartContainer.value) {
-    myChart = echarts.init(chartContainer.value, "dark");
+    const width = chartContainer.value.clientWidth + 40;
+    const height = chartContainer.value.clientHeight;
+    myChart = echarts.init(chartContainer.value, "dark", { width, height });
     updateChart();
     window.addEventListener("resize", handleResize);
-    
+
     // 加载股票数据和K线图数据
     loadStockData();
     loadKlineData();
@@ -196,6 +208,7 @@ onBeforeUnmount(() => {
 <style scoped>
 #chart-container {
   width: 100%;
-  height: 90vh;
+  height: 95vh;
+  overflow: hidden;
 }
 </style>

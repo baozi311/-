@@ -1,112 +1,135 @@
 <template>
-  <div class="history-sidebar">
-    <div class="sidebar-header">
-      <h3>股票盘</h3>
-      <button @click="loadAllData" :disabled="diskLoading" class="btn-refresh">
-        {{ diskLoading ? "加载中..." : "刷新" }}
-      </button>
-    </div>
+  <div class="history-sidebar" :class="{ collapsed }">
+    <button class="toggle-btn" @click="emit('toggle')">
+      {{ collapsed ? "»" : "«" }}
+    </button>
+    <div class="sidebar-content" v-show="!collapsed">
+      <div class="sidebar-header">
+        <h3>股票盘</h3>
+        <button
+          @click="loadAllData"
+          :disabled="diskLoading"
+          class="btn-refresh"
+        >
+          {{ diskLoading ? "加载中..." : "刷新" }}
+        </button>
+      </div>
 
-    <!-- 当前盘显示最新数据 -->
-    <div class="history-list" @click="switchToCurrentDisk">
-      <div v-if="historyLoading" class="loading-message">加载当前盘数据...</div>
-      <div v-else-if="historyError" class="error-message">
-        {{ historyError }}
-      </div>
-      <div v-else-if="formattedHistoryData.length === 0" class="empty-message">
-        暂无数据
-      </div>
-      <div v-else class="history-item active">
-        <div class="date-section">
-          <span class="date">{{ latestData?.date }}</span>
-          <span class="time">{{ latestData?.time }}</span>
-          <span class="current-badge">当前盘</span>
+      <!-- 当前盘显示最新数据 -->
+      <div class="history-list" @click="switchToCurrentDisk">
+        <div v-if="historyLoading" class="loading-message">
+          加载当前盘数据...
         </div>
-        <div class="price-section">
-          <div class="price-info">
-            <span class="label">单价</span>
-            <span class="value">{{ toFixed4(latestData?.open) }}</span>
-          </div>
-          <div class="price-info">
-            <span class="label">总股</span>
-            <span class="value">{{ latestData?.volume }}</span>
-          </div>
+        <div v-else-if="historyError" class="error-message">
+          {{ historyError }}
         </div>
         <div
-          class="change-section"
-          :class="(latestData?.change || 0) >= 0 ? 'up' : 'down'"
+          v-else-if="formattedHistoryData.length === 0"
+          class="empty-message"
         >
-          <span class="change-value">
-            {{ (latestData?.change || 0) >= 0 ? "+" : ""
-            }}{{ toFixed4(latestData?.change) }}
-          </span>
-          <span class="change-percent">
-            ({{ toFixed4(latestData?.changePercent) }}%)
-          </span>
+          暂无数据
         </div>
-      </div>
-    </div>
-    <!-- 封存盘列表 -->
-    <div class="closed-disks-section">
-      <div class="section-title">封存盘</div>
-      <div class="disk-list">
-        <div v-if="diskLoading" class="loading-message">加载中...</div>
-        <div v-else-if="closedDisks.length === 0" class="empty-message">
-          暂无封存盘
-        </div>
-        <div
-          v-else
-          v-for="disk in closedDisks"
-          :key="disk.id"
-          class="disk-item"
-          :class="{ active: activeTab === 'disk-' + disk.id }"
-          @click="selectDisk(disk.id)"
-        >
-          <div class="disk-header">
-            <span class="disk-id">盘 #{{ disk.id }}</span>
-            <span class="disk-badge">已封盘</span>
+        <div v-else class="history-item active">
+          <div class="date-section">
+            <span class="date">{{ latestData?.date }}</span>
+            <span class="time">{{ latestData?.time }}</span>
+            <span class="current-badge">当前盘</span>
           </div>
-          <div class="disk-stats">
-            <span class="disk-time"
-              >{{ formatTime(disk.startTime, true) }} -
-              {{ formatTime(disk.endTime, true) }}</span
-            >
+          <div class="price-section">
+            <div class="price-info">
+              <span class="label">单价</span>
+              <span class="value">{{ toFixed4(latestData?.open) }}</span>
+            </div>
+            <div class="price-info">
+              <span class="label">总股</span>
+              <span class="value">{{ latestData?.volume }}</span>
+            </div>
           </div>
-          <div class="disk-price-range">
-            <span class="price-label">最高</span>
-            <span class="price-value high">{{
-              toFixed4(disk.highPrice) || "0.0000"
-            }}</span>
-            <span class="price-label">最低</span>
-            <span class="price-value low">{{
-              toFixed4(disk.lowPrice) || "0.0000"
-            }}</span>
+          <div
+            class="change-section"
+            :class="(latestData?.change || 0) >= 0 ? 'up' : 'down'"
+          >
+            <span class="change-value">
+              {{ (latestData?.change || 0) >= 0 ? "+" : ""
+              }}{{ toFixed4(latestData?.change) }}
+            </span>
+            <span class="change-percent">
+              ({{ toFixed4(latestData?.changePercent) }}%)
+            </span>
           </div>
         </div>
       </div>
-    </div>
+      <!-- 封存盘列表 -->
+      <div class="closed-disks-section">
+        <div class="section-title">封存盘</div>
+        <div class="disk-list">
+          <div v-if="diskLoading" class="loading-message">加载中...</div>
+          <div v-else-if="closedDisks.length === 0" class="empty-message">
+            暂无封存盘
+          </div>
+          <div
+            v-else
+            v-for="disk in closedDisks"
+            :key="disk.id"
+            class="disk-item"
+            :class="{ active: activeTab === 'disk-' + disk.id }"
+            @click="selectDisk(disk.id)"
+          >
+            <div class="disk-header">
+              <span class="disk-id">盘 #{{ disk.id }}</span>
+              <span class="disk-badge">已封盘</span>
+            </div>
+            <div class="disk-stats">
+              <span class="disk-time"
+                >{{ formatTime(disk.startTime, true) }} -
+                {{ formatTime(disk.endTime, true) }}</span
+              >
+            </div>
+            <div class="disk-price-range">
+              <span class="price-label">最高</span>
+              <span class="price-value high">{{
+                toFixed4(disk.highPrice) || "0.0000"
+              }}</span>
+              <span class="price-label">最低</span>
+              <span class="price-value low">{{
+                toFixed4(disk.lowPrice) || "0.0000"
+              }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <!-- 封存盘数据列表 -->
+      <!-- 封存盘数据列表 -->
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, defineProps, defineEmits } from "vue";
 import {
   historyData,
   historyLoading,
   historyError,
   diskList,
   diskLoading,
-  currentDiskId,
-  stockData,
   loadHistoryData,
   loadKlineData,
   loadDiskList,
-  loadDiskData,
   loadDiskKline,
   loadStockData,
 } from "../stores/stockStore";
+
+interface Props {
+  collapsed?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  collapsed: false,
+});
+
+const emit = defineEmits<{
+  (e: "toggle"): void;
+}>();
 
 interface HistoryItem {
   date: string;
@@ -236,6 +259,35 @@ onMounted(() => {
   left: 0;
   top: 0;
   z-index: 100;
+  transition: width 0.3s ease;
+}
+
+.history-sidebar.collapsed {
+  width: 00px;
+}
+
+.toggle-btn {
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 60px;
+  background-color: #2a2e39;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  color: #d1d4dc;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  z-index: 101;
+  transition: background-color 0.2s ease;
+}
+
+.toggle-btn:hover {
+  background-color: #363a45;
 }
 
 .sidebar-header {

@@ -31,10 +31,6 @@ const stockData = reactive<StockData>({
   lastUpdated: ''
 });
 
-// 从 localStorage 读取上一次价格
-const savedPrice = localStorage.getItem('previousUnitPrice');
-let previousUnitPrice = savedPrice ? parseFloat(savedPrice) : 0;
-
 const historyData = ref<StockData[]>([]);
 const klineData = ref<KLineData[]>([]);
 const diskList = ref<DiskInfo[]>([]);
@@ -89,9 +85,6 @@ function connectWebSocket() {
       clearTimeout(reconnectTimer);
       reconnectTimer = null;
     }
-    // 连接成功后加载初始数据
-    loadStockData();
-    loadDiskList();
   };
 
   ws.onmessage = (event) => {
@@ -118,18 +111,9 @@ function connectWebSocket() {
 function handleWebSocketMessage(message: any) {
   switch (message.type) {
     case 'stock_update':
-      // 保存上一次价格到 localStorage
-      localStorage.setItem('previousUnitPrice', String(stockData.unitPrice));
-      previousUnitPrice = stockData.unitPrice;
       Object.assign(stockData, message.data);
       stockData.lastUpdated = new Date().toLocaleString();
       currentDiskId.value = message.diskId;
-      
-      // 更新历史数据
-      historyData.value.push({ ...message.data });
-      // 更新K线图数据
-      const time = new Date(message.data.timestamp).toTimeString().split(' ')[0];
-      klineData.value.push([time, message.data.unitPrice, message.data.unitPrice, message.data.unitPrice, message.data.unitPrice, message.data.totalStock]);
       break;
     case 'disks_update':
       diskList.value = message.data;
@@ -324,7 +308,6 @@ export {
   formattedTotalMoney,
   formattedPersonalMoney,
   formattedUnitPrice,
-  previousUnitPrice,
   loadStockData,
   loadHistoryData,
   loadKlineData,

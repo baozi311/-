@@ -1,69 +1,74 @@
 <template>
-  <div class="stock-sidebar">
-    <div class="sidebar-header">
-      <h3>股票信息</h3>
-      <button @click="loadStockData" :disabled="loading" class="btn-refresh">
-        {{ loading ? "加载中..." : "刷新" }}
-      </button>
-    </div>
-
-    <div class="stock-info">
-      <div v-if="error" class="error-message">
-        {{ error }}
+  <div class="stock-sidebar" :class="{ collapsed }">
+    <button class="toggle-btn" @click="emit('toggle')">
+      {{ collapsed ? "«" : "»" }}
+    </button>
+    <div class="sidebar-content" v-show="!collapsed">
+      <div class="sidebar-header">
+        <h3>股票信息</h3>
+        <button @click="loadStockData" :disabled="loading" class="btn-refresh">
+          {{ loading ? "加载中..." : "刷新" }}
+        </button>
       </div>
 
-      <template v-else>
-        <div class="stock-header">
-          <span class="stock-symbol">{{ symbol }}</span>
-          <span class="stock-name">{{ name }}</span>
+      <div class="stock-info">
+        <div v-if="error" class="error-message">
+          {{ error }}
         </div>
 
-        <div class="stock-price-section">
-          <div class="current-price" :class="priceChangeClass">
-            {{ formattedUnitPrice }}
+        <template v-else>
+          <div class="stock-header">
+            <span class="stock-symbol">{{ symbol }}</span>
+            <span class="stock-name">{{ name }}</span>
           </div>
-          <div class="price-change" :class="priceChangeClass">
-            <span v-if="priceChange >= 0">+</span>
-            {{ toFixed4(priceChange) }}
-            <span class="percent-change">
-              ({{ toFixed4(percentChange) }}%)
-            </span>
-          </div>
-        </div>
 
-        <div class="stock-details">
-          <div class="detail-item">
-            <span class="label">单价</span>
-            <span class="value">{{ formattedUnitPrice }}</span>
+          <div class="stock-price-section">
+            <div class="current-price" :class="priceChangeClass">
+              {{ formattedUnitPrice }}
+            </div>
+            <div class="price-change" :class="priceChangeClass">
+              <span v-if="priceChange >= 0">+</span>
+              {{ toFixed4(priceChange) }}
+              <span class="percent-change">
+                ({{ toFixed4(percentChange) }}%)
+              </span>
+            </div>
           </div>
-          <div class="detail-item">
-            <span class="label">总库存</span>
-            <span class="value">{{ totalStock }}</span>
-          </div>
-          <div class="detail-item">
+
+          <div class="stock-details">
+            <div class="detail-item">
+              <span class="label">单价</span>
+              <span class="value">{{ formattedUnitPrice }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">总库存</span>
+              <span class="value">{{ totalStock }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">总金额</span>
+              <span class="value">{{ formattedTotalMoney }}</span>
+            </div>
+            <!-- <div class="detail-item">
             <span class="label">个人库存</span>
             <span class="value">{{ personalStock }}</span>
           </div>
           <div class="detail-item">
-            <span class="label">总金额</span>
-            <span class="value">{{ formattedTotalMoney }}</span>
-          </div>
-          <div class="detail-item">
             <span class="label">个人金额</span>
             <span class="value">{{ formattedPersonalMoney }}</span>
+          </div> -->
+            <div class="detail-item">
+              <span class="label">最后更新</span>
+              <span class="value">{{ lastUpdated || "从未" }}</span>
+            </div>
           </div>
-          <div class="detail-item">
-            <span class="label">最后更新</span>
-            <span class="value">{{ lastUpdated || "从未" }}</span>
-          </div>
-        </div>
-      </template>
+        </template>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, defineProps, defineEmits } from "vue";
 import {
   stockData,
   historyData,
@@ -75,6 +80,18 @@ import {
   loadStockData,
   loadHistoryData,
 } from "../stores/stockStore";
+
+interface Props {
+  collapsed?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  collapsed: false,
+});
+
+const emit = defineEmits<{
+  (e: "toggle"): void;
+}>();
 
 // 股票基本信息
 const symbol = "IIROSE";
@@ -130,6 +147,35 @@ onMounted(() => {
   right: 0;
   top: 0;
   z-index: 100;
+  transition: width 0.3s ease;
+}
+
+.stock-sidebar.collapsed {
+  width: 00px;
+}
+
+.toggle-btn {
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 60px;
+  background-color: #2a2e39;
+  border: none;
+  border-radius: 4px 0 0 4px;
+  color: #d1d4dc;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  z-index: 101;
+  transition: background-color 0.2s ease;
+}
+
+.toggle-btn:hover {
+  background-color: #363a45;
 }
 
 .sidebar-header {
