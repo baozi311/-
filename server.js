@@ -40,7 +40,9 @@ wss.on('connection', (ws) => {
       isClosed: disk.isClosed,
       dataCount: disk.data.length,
       highPrice: disk.highPrice || null,
-      lowPrice: disk.lowPrice || null
+      lowPrice: disk.lowPrice || null,
+      maxStock: disk.maxStock || null,
+      minStock: disk.minStock || null
     })),
     currentDiskId: currentDisk ? currentDisk.id : null
   }))
@@ -121,6 +123,17 @@ function loadData() {
       const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'))
       stockDisks = data.stockDisks || []
 
+      // 为所有封存盘重新计算 maxStock/minStock
+      for (const disk of stockDisks) {
+        if (disk.isClosed && disk.data && disk.data.length > 0) {
+          const stocks = disk.data.map(d => d.totalStock)
+          disk.maxStock = Math.max(...stocks)
+          // 排除1000（初始开盘数量），找最接近1000的值
+          const stocksWithoutBase = stocks.filter(s => s !== 1000)
+          disk.minStock = stocksWithoutBase.length > 0 ? Math.min(...stocksWithoutBase) : 1000
+        }
+      }
+
       // 恢复当前盘
       if (data.currentDiskId) {
         currentDisk = stockDisks.find(d => d.id === data.currentDiskId) || null
@@ -168,14 +181,20 @@ function createNewDisk(startData) {
 // 计算盘的统计信息
 function calculateDiskStats(disk) {
   if (!disk.data || disk.data.length === 0) {
-    return { highPrice: 0, lowPrice: 0 }
+    return { highPrice: 0, lowPrice: 0, maxStock: 0, minStock: 0 }
   }
 
   const prices = disk.data.map(d => d.unitPrice)
+  const stocks = disk.data.map(d => d.totalStock)
   const highPrice = Math.max(...prices)
   const lowPrice = Math.min(...prices)
+  const maxStock = Math.max(...stocks)
 
-  return { highPrice, lowPrice }
+  // 排除1000（初始开盘数量），找最接近1000的值
+  const stocksWithoutBase = stocks.filter(s => s !== 1000)
+  let minStock = stocksWithoutBase.length > 0 ? Math.min(...stocksWithoutBase) : 1000
+
+  return { highPrice, lowPrice, maxStock, minStock }
 }
 
 // 封存当前盘
@@ -187,7 +206,9 @@ function closeCurrentDisk() {
     const stats = calculateDiskStats(currentDisk)
     currentDisk.highPrice = stats.highPrice
     currentDisk.lowPrice = stats.lowPrice
-    console.log(`封存盘 #${currentDisk.id}, 最高价: ${stats.highPrice}, 最低价: ${stats.lowPrice}`)
+    currentDisk.maxStock = stats.maxStock
+    currentDisk.minStock = stats.minStock
+    console.log(`封存盘 #${currentDisk.id}, 最高价: ${stats.highPrice}, 最低价: ${stats.lowPrice}, 最多股: ${stats.maxStock}, 最少股: ${stats.minStock}`)
     saveData()
 
     // 广播给所有客户端
@@ -200,7 +221,9 @@ function closeCurrentDisk() {
         isClosed: currentDisk.isClosed,
         dataCount: currentDisk.data.length,
         highPrice: currentDisk.highPrice,
-        lowPrice: currentDisk.lowPrice
+        lowPrice: currentDisk.lowPrice,
+        maxStock: currentDisk.maxStock,
+        minStock: currentDisk.minStock
       }
     })
 
@@ -211,12 +234,12 @@ function closeCurrentDisk() {
   }
 }
 
-// 检查是否需要清理（每天凌晨3点后，如果当前盘最后数据是昨天的，清理所有数据）
+// 检查是否需要清理（每天早上9点后，如果当前盘最后数据是昨天的，清理所有数据）
 function checkAndClearOldData() {
   const now = new Date()
-  const resetHour = 3
+  const resetHour = 9
 
-  // 只在凌晨3点之后检查
+  // 只在早上9点之后检查
   if (now.getHours() < resetHour) {
     return false
   }
@@ -226,7 +249,7 @@ function checkAndClearOldData() {
 
   // 如果当前盘未封盘，不清理，等待封盘后再处理
   if (currentDisk && !isCurrentDiskClosed) {
-    console.log('当前盘尚未封盘，推迟清理...')
+    console.log('当前盘尚未封盘，推迟到9点后清理...')
     return false
   }
 
@@ -237,7 +260,7 @@ function checkAndClearOldData() {
 
     // 如果最后数据是昨天的，清理所有数据
     if (lastDataDate.getTime() < today.getTime()) {
-      console.log('检测到新的一天（凌晨3点后），且当前盘已封盘，清理所有历史数据...')
+      console.log('检测到新的一天（早上9点后），且当前盘已封盘，清理所有历史数据...')
       // 清理所有数据
       stockDisks = []
       currentDisk = null
@@ -252,24 +275,24 @@ function checkAndClearOldData() {
   return false
 }
 
-// 每天凌晨3点检查并清理数据
+// 每天早上9点检查并清理数据
 function scheduleDailyClear() {
   const now = new Date()
-  const resetHour = 3
+  const resetHour = 9
   const resetMinute = 0
-  
+
   let nextClear = new Date(now)
   nextClear.setHours(resetHour, resetMinute, 0, 0)
-  
+
   // 如果已经过了3点，设置到明天3点
   if (now.getHours() >= resetHour) {
     nextClear.setDate(nextClear.getDate() + 1)
   }
-  
+
   const msUntilNextClear = nextClear.getTime() - now.getTime()
-  
+
   console.log(`定时清理已设置，将在 ${nextClear.toLocaleString()} 执行（${Math.round(msUntilNextClear / 1000 / 60)} 分钟后）`)
-  
+
   setTimeout(() => {
     checkAndClearOldData()
     // 然后每天3点执行一次
@@ -296,7 +319,7 @@ function generateKLineData(diskData) {
     return []
   }
 
-  const sortedData = [...diskData].sort((a, b) => 
+  const sortedData = [...diskData].sort((a, b) =>
     new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
   )
 
@@ -355,7 +378,9 @@ app.get('/disks', (req, res) => {
       isClosed: disk.isClosed,
       dataCount: disk.data.length,
       highPrice: disk.highPrice || null,
-      lowPrice: disk.lowPrice || null
+      lowPrice: disk.lowPrice || null,
+      maxStock: disk.maxStock || null,
+      minStock: disk.minStock || null
     })),
     count: stockDisks.length,
     currentDiskId: currentDisk ? currentDisk.id : null

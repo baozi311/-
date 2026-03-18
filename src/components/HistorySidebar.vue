@@ -1,8 +1,8 @@
 <template>
   <div class="history-sidebar" :class="{ collapsed }">
-    <button class="toggle-btn" @click="emit('toggle')">
+    <!-- <button class="toggle-btn" @click="emit('toggle')">
       {{ collapsed ? "»" : "«" }}
-    </button>
+    </button> -->
     <div class="sidebar-content" v-show="!collapsed">
       <div class="sidebar-header">
         <h3>股票盘</h3>
@@ -86,14 +86,20 @@
               >
             </div>
             <div class="disk-price-range">
-              <span class="price-label">最高</span>
+              <span class="price-label">最高价</span>
               <span class="price-value high">{{
                 toFixed4(disk.highPrice) || "0.0000"
               }}</span>
-              <span class="price-label">最低</span>
+              <span class="price-label">最低价</span>
               <span class="price-value low">{{
                 toFixed4(disk.lowPrice) || "0.0000"
               }}</span>
+            </div>
+            <div class="disk-price-range">
+              <span class="price-label">最多股</span>
+              <span class="price-value high">{{ disk.maxStock || 0 }}</span>
+              <span class="price-label">最少股</span>
+              <span class="price-value low">{{ disk.minStock || 0 }}</span>
             </div>
           </div>
         </div>

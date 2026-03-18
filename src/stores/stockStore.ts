@@ -20,6 +20,8 @@ interface DiskInfo {
   dataCount: number;
   highPrice: number | null;
   lowPrice: number | null;
+  maxStock: number | null;
+  minStock: number | null;
 }
 
 const stockData = reactive<StockData>({
@@ -115,24 +117,27 @@ function handleWebSocketMessage(message: any) {
       stockData.lastUpdated = new Date().toLocaleString();
       currentDiskId.value = message.diskId;
       if (message.data && message.data.timestamp) {
-        historyData.value.push({
-          ...message.data,
-          timestamp: message.data.timestamp
-        });
-        const time = new Date(message.data.timestamp).toTimeString().split(' ')[0];
-        const prevItem = historyData.value[historyData.value.length - 2];
-        const open = prevItem ? prevItem.unitPrice : message.data.unitPrice;
-        const close = message.data.unitPrice;
-        const high = Math.max(open, close);
-        const low = Math.min(open, close);
-        klineData.value.push([
-          time,
-          open,
-          close,
-          low,
-          high,
-          message.data.totalStock
-        ]);
+        const lastHistory = historyData.value[historyData.value.length - 1];
+        if (!lastHistory || lastHistory.timestamp !== message.data.timestamp) {
+          historyData.value.push({
+            ...message.data,
+            timestamp: message.data.timestamp
+          });
+          const time = new Date(message.data.timestamp).toTimeString().split(' ')[0];
+          const prevItem = historyData.value[historyData.value.length - 2];
+          const open = prevItem ? prevItem.unitPrice : message.data.unitPrice;
+          const close = message.data.unitPrice;
+          const high = Math.max(open, close);
+          const low = Math.min(open, close);
+          klineData.value.push([
+            time,
+            open,
+            close,
+            low,
+            high,
+            message.data.totalStock
+          ]);
+        }
       }
       break;
     case 'disks_update':

@@ -38,6 +38,16 @@ onUnmounted(() => {
   <div class="app-container">
     <HistorySidebar :collapsed="leftCollapsed" />
     <div
+      v-if="isMobile && !leftCollapsed"
+      class="sidebar-overlay left"
+      @click="leftCollapsed = true"
+    ></div>
+    <div
+      v-if="isMobile && !rightCollapsed"
+      class="sidebar-overlay right"
+      @click="rightCollapsed = true"
+    ></div>
+    <div
       class="chart-section"
       :style="{
         marginLeft: leftCollapsed ? '60px' : '280px',
@@ -147,6 +157,24 @@ onUnmounted(() => {
   border-radius: 6px 0 0 6px;
 }
 
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+}
+
+.sidebar-overlay.left {
+  right: 0;
+  left: 280px;
+}
+
+.sidebar-overlay.right {
+  left: 0;
+  right: 300px;
+}
+
 @media (max-width: 768px) {
   .app-container {
     flex-direction: column;
@@ -155,6 +183,12 @@ onUnmounted(() => {
   .chart-section {
     margin-left: 0px !important;
     margin-right: 0px !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .sidebar-overlay {
+    display: none;
   }
 }
 </style>

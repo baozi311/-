@@ -14,6 +14,10 @@
         折线
       </button>
     </div>
+    <div v-if="klineLoading" class="chart-loading">
+      <div class="loading-spinner"></div>
+      <span>加载中...</span>
+    </div>
     <div id="chart-container" ref="chartContainer"></div>
   </div>
 </template>
@@ -374,6 +378,34 @@ onBeforeUnmount(() => {
   gap: 10px;
   padding: 10px;
   background-color: #1e222d;
+}
+
+.chart-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: #d1d4dc;
+  font-size: 14px;
+  z-index: 100;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #2a2e39;
+  border-top: 3px solid #26a69a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .chart-controls button {
