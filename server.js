@@ -110,7 +110,7 @@ function saveData() {
       currentDiskId: currentDisk ? currentDisk.id : null
     }
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8')
-    console.log('数据已保存到文件')
+    // console.log('数据已保存到文件')
   } catch (error) {
     console.error('保存数据失败:', error)
   }
@@ -234,77 +234,40 @@ function closeCurrentDisk() {
   }
 }
 
-// 检查是否需要清理（每天早上9点后，如果当前盘最后数据是昨天的，清理所有数据）
-function checkAndClearOldData() {
-  const now = new Date()
-  const resetHour = 9
+// 封盘后检查是否需要清理数据
+const MAX_CLOSED_DISKS = 50  // 封盘达到50个后清理
 
-  // 只在早上9点之后检查
-  if (now.getHours() < resetHour) {
-    return false
-  }
+function checkAndClearByDiskCount() {
+  const closedDisks = stockDisks.filter(disk => disk.isClosed === true)
 
-  // 检查当前盘是否已封盘
-  const isCurrentDiskClosed = currentDisk && currentDisk.isClosed === true
+  console.log(`当前封盘数量: ${closedDisks.length}/${MAX_CLOSED_DISKS}`)
 
-  // 如果当前盘未封盘，不清理，等待封盘后再处理
-  if (currentDisk && !isCurrentDiskClosed) {
-    console.log('当前盘尚未封盘，推迟到9点后清理...')
-    return false
-  }
-
-  if (currentDisk && currentDisk.data.length > 0) {
-    const lastDataTime = new Date(currentDisk.data[currentDisk.data.length - 1].timestamp)
-    const lastDataDate = new Date(lastDataTime.getFullYear(), lastDataTime.getMonth(), lastDataTime.getDate())
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-
-    // 如果最后数据是昨天的，清理所有数据
-    if (lastDataDate.getTime() < today.getTime()) {
-      console.log('检测到新的一天（早上9点后），且当前盘已封盘，清理所有历史数据...')
-      // 清理所有数据
-      stockDisks = []
-      currentDisk = null
-      // 创建新盘
-      createNewDisk({
-        ...CRASH_DATA,
-        timestamp: new Date().toISOString()
-      })
-      return true
-    }
+  if (closedDisks.length >= MAX_CLOSED_DISKS) {
+    console.log(`封盘数量达到 ${MAX_CLOSED_DISKS} 个，清理所有历史数据...`)
+    stockDisks = []
+    currentDisk = null
+    createNewDisk({
+      ...CRASH_DATA,
+      timestamp: new Date().toISOString()
+    })
+    saveData()
+    return true
   }
   return false
 }
 
-// 每天早上9点检查并清理数据
-function scheduleDailyClear() {
-  const now = new Date()
-  const resetHour = 9
-  const resetMinute = 0
-
-  let nextClear = new Date(now)
-  nextClear.setHours(resetHour, resetMinute, 0, 0)
-
-  // 如果已经过了3点，设置到明天3点
-  if (now.getHours() >= resetHour) {
-    nextClear.setDate(nextClear.getDate() + 1)
-  }
-
-  const msUntilNextClear = nextClear.getTime() - now.getTime()
-
-  console.log(`定时清理已设置，将在 ${nextClear.toLocaleString()} 执行（${Math.round(msUntilNextClear / 1000 / 60)} 分钟后）`)
-
-  setTimeout(() => {
-    checkAndClearOldData()
-    // 然后每天3点执行一次
-    setInterval(() => {
-      checkAndClearOldData()
-    }, 24 * 60 * 60 * 1000) // 24小时
-  }, msUntilNextClear)
+// 检查是否需要清理（每天早上9点后，如果当前盘最后数据是昨天的，清理所有数据）
+function checkAndClearOldData() {
+  return checkAndClearByDiskCount()
 }
+
+// 每隔5分钟检查一次封盘数量
+setInterval(() => {
+  checkAndClearByDiskCount()
+}, 5 * 60 * 1000)
 
 loadData()
 checkAndClearOldData()
-scheduleDailyClear()
 
 if (stockDisks.length === 0 || !currentDisk) {
   createNewDisk({
@@ -457,7 +420,7 @@ app.get('/disks/:id/kline', (req, res) => {
 app.post('/stock', (req, res) => {
   try {
     const stockData = req.body
-    console.log('收到股票数据:', stockData)
+    console.log('收到股票数据:', new Date().toISOString(), stockData)
 
     // 验证数据结构
     const requiredFields = ['unitPrice', 'totalStock', 'personalStock', 'totalMoney', 'personalMoney']
@@ -497,7 +460,7 @@ app.post('/stock', (req, res) => {
     // 存储到当前盘
     if (currentDisk) {
       currentDisk.data.push(dataWithTimestamp)
-      console.log(`数据已添加到盘 #${currentDisk.id}`)
+      // console.log(`数据已添加到盘 #${currentDisk.id}`)
       saveData()
 
       // 广播给所有客户端
@@ -572,6 +535,49 @@ app.get('/stock/kline', (req, res) => {
     count: klineData.length,
     lastUpdated: currentDisk.data.length > 0 ? currentDisk.data[currentDisk.data.length - 1].timestamp : null,
     diskId: currentDisk.id
+  })
+})
+
+// AI分析接口 - 返回股票数据供AI分析预测
+app.get('/ai/analysis', (req, res) => {
+  if (!currentDisk || currentDisk.data.length === 0) {
+    return res.json({
+      success: true,
+      message: '当前没有活跃的股票盘',
+      data: null
+    })
+  }
+
+  const data = currentDisk.data
+  const latestData = data[data.length - 1]
+  const previousData = data.length > 1 ? data[data.length - 2] : null
+
+  res.json({
+    success: true,
+    diskId: currentDisk.id,
+    startTime: currentDisk.startTime,
+    isClosed: currentDisk.isClosed,
+    data: data,
+    latest: {
+      unitPrice: latestData.unitPrice,
+      totalStock: latestData.totalStock,
+      totalMoney: latestData.totalMoney,
+      timestamp: latestData.timestamp
+    },
+    previous: previousData ? {
+      unitPrice: previousData.unitPrice,
+      totalStock: previousData.totalStock,
+      totalMoney: previousData.totalMoney,
+      timestamp: previousData.timestamp
+    } : null,
+    statistics: {
+      highPrice: currentDisk.highPrice || null,
+      lowPrice: currentDisk.lowPrice || null,
+      maxStock: currentDisk.maxStock || null,
+      minStock: currentDisk.minStock || null,
+      totalRecords: data.length
+    },
+    lastUpdated: latestData.timestamp
   })
 })
 

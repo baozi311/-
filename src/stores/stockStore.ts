@@ -24,6 +24,17 @@ interface DiskInfo {
   minStock: number | null;
 }
 
+interface Danmaku {
+  id: number;
+  diskId: number;
+  text: string;
+  timestamp: string;
+  color: string;
+  top: number;
+  duration: number;
+  count: number;
+}
+
 const stockData = reactive<StockData>({
   unitPrice: 0,
   totalStock: 0,
@@ -37,6 +48,9 @@ const historyData = ref<StockData[]>([]);
 const klineData = ref<KLineData[]>([]);
 const diskList = ref<DiskInfo[]>([]);
 const currentDiskId = ref<number | null>(null);
+const danmakuMap = ref<Map<number, Danmaku[]>>(new Map());
+const danmakuIdCounter = ref(0);
+const danmakuLoaded = ref(false);
 
 const loading = ref(false);
 const historyLoading = ref(false);
@@ -165,6 +179,32 @@ function handleWebSocketMessage(message: any) {
         closedDisk.highPrice = message.data.highPrice;
         closedDisk.lowPrice = message.data.lowPrice;
         closedDisk.dataCount = message.data.dataCount;
+      }
+      break;
+    case 'danmaku':
+      if (message.data && message.data.diskId !== undefined && message.data.text) {
+        const danmaku: Danmaku = {
+          id: message.data.id || danmakuIdCounter.value++,
+          diskId: message.data.diskId,
+          text: message.data.text,
+          timestamp: message.data.timestamp || new Date().toISOString(),
+          color: message.data.color || getRandomColor(),
+          top: message.data.top !== undefined ? message.data.top : getRandomTop(),
+          duration: message.data.duration !== undefined ? message.data.duration : getRandomDuration(),
+        };
+        
+        if (!danmakuMap.value.has(danmaku.diskId)) {
+          danmakuMap.value.set(danmaku.diskId, []);
+        }
+        danmakuMap.value.get(danmaku.diskId)!.push(danmaku);
+      }
+      break;
+    case 'danmaku_history':
+      if (message.data && Array.isArray(message.data.danmakuList)) {
+        const diskId = message.data.diskId;
+        if (diskId !== undefined) {
+          danmakuMap.value.set(diskId, message.data.danmakuList);
+        }
       }
       break;
   }
@@ -303,6 +343,33 @@ async function loadDiskKline(diskId: number) {
   }
 }
 
+async function loadDanmakuFromFile() {
+  try {
+    const response = await fetch('/danmaku-data.json');
+    const data = await response.json();
+    
+    if (data.danmakuDisks && Array.isArray(data.danmakuDisks)) {
+      data.danmakuDisks.forEach((diskData: any) => {
+        const diskId = diskData.diskId;
+        const danmakuList = diskData.danmakuList;
+        if (diskId !== undefined && Array.isArray(danmakuList)) {
+          danmakuMap.value.set(diskId, danmakuList);
+          // Update danmakuIdCounter to be higher than the highest id in the loaded data
+          danmakuList.forEach((danmaku: Danmaku) => {
+            if (danmaku.id > danmakuIdCounter.value) {
+              danmakuIdCounter.value = danmaku.id + 1;
+            }
+          });
+        }
+      });
+      danmakuLoaded.value = true;
+      console.log('Danmaku data loaded from danmaku-data.json');
+    }
+  } catch (error) {
+    console.error('Error loading danmaku data:', error);
+  }
+}
+
 function disconnectWebSocket() {
   if (ws) {
     ws.close();
@@ -314,7 +381,133 @@ function disconnectWebSocket() {
   }
 }
 
+const colors = [
+  "#ffffff",
+  "#ffeb3b",
+  "#00bcd4",
+  "#ff5722",
+  "#9c27b0",
+  "#4caf50",
+  "#e91e63",
+];
+
+function getRandomColor(): string {
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+
+function getRandomTop(): number {
+  return Math.random() * 80 + 5;
+}
+
+function getRandomDuration(): number {
+  return 15 + Math.random() * 3; // 移动速度
+}
+
+function addDanmaku(diskId: number, text: string): Danmaku {
+  // 检查是否已经存在相同文本的弹幕
+  if (danmakuMap.value.has(diskId)) {
+    const existingDanmaku = danmakuMap.value.get(diskId)!.find(d => d.text === text);
+    if (existingDanmaku) {
+      // 增加计数
+      existingDanmaku.count++;
+      existingDanmaku.timestamp = new Date().toISOString();
+      return existingDanmaku;
+    }
+  }
+
+  const danmaku: Danmaku = {
+    id: danmakuIdCounter.value++,
+    diskId,
+    text,
+    timestamp: new Date().toISOString(),
+    color: getRandomColor(),
+    top: getRandomTop(),
+    duration: getRandomDuration(),
+    count: 1,
+  };
+
+  if (!danmakuMap.value.has(diskId)) {
+    danmakuMap.value.set(diskId, []);
+  }
+  danmakuMap.value.get(diskId)!.push(danmaku);
+
+  return danmaku;
+}
+
+function sendDanmaku(diskId: number, text: string) {
+  const danmaku = addDanmaku(diskId, text);
+  
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({
+      type: 'danmaku',
+      data: danmaku
+    }));
+  }
+  
+  // Save danmaku to localStorage for persistence
+  saveDanmakuToLocalStorage();
+}
+
+function saveDanmakuToLocalStorage() {
+  try {
+    const danmakuObject: Record<number, Danmaku[]> = {};
+    danmakuMap.value.forEach((danmakuList, diskId) => {
+      danmakuObject[diskId] = danmakuList;
+    });
+    localStorage.setItem('danmaku', JSON.stringify(danmakuObject));
+    console.log('Danmaku data saved to localStorage');
+  } catch (error) {
+    console.error('Error saving danmaku to localStorage:', error);
+  }
+}
+
+function loadDanmakuFromLocalStorage() {
+  try {
+    const storedData = localStorage.getItem('danmaku');
+    if (storedData) {
+      const danmakuObject = JSON.parse(storedData);
+      Object.entries(danmakuObject).forEach(([diskIdStr, danmakuList]) => {
+        const diskId = parseInt(diskIdStr);
+        if (!isNaN(diskId) && Array.isArray(danmakuList)) {
+          danmakuMap.value.set(diskId, danmakuList);
+          // Update danmakuIdCounter
+          danmakuList.forEach((danmaku: Danmaku) => {
+            if (danmaku.id > danmakuIdCounter.value) {
+              danmakuIdCounter.value = danmaku.id + 1;
+            }
+          });
+        }
+      });
+      danmakuLoaded.value = true;
+      console.log('Danmaku data loaded from localStorage');
+    }
+  } catch (error) {
+    console.error('Error loading danmaku from localStorage:', error);
+  }
+}
+
+function getDanmakuByDiskId(diskId: number): Danmaku[] {
+  return danmakuMap.value.get(diskId) || [];
+}
+
+function clearDanmakuByDiskId(diskId: number) {
+  danmakuMap.value.delete(diskId);
+}
+
+function getCurrentDiskDanmaku(): Danmaku[] {
+  if (currentDiskId.value === null) return [];
+  return getDanmakuByDiskId(currentDiskId.value);
+}
+
 connectWebSocket();
+
+// Load danmaku data when the store is initialized
+(async () => {
+  // First try to load from JSON file
+  await loadDanmakuFromFile();
+  // Then try to load from localStorage (which may have newer data)
+  loadDanmakuFromLocalStorage();
+})();
 
 export {
   stockData,
@@ -322,6 +515,7 @@ export {
   klineData,
   diskList,
   currentDiskId,
+  danmakuMap,
   loading,
   historyLoading,
   klineLoading,
@@ -339,5 +533,12 @@ export {
   loadDiskList,
   loadDiskData,
   loadDiskKline,
-  disconnectWebSocket
+  disconnectWebSocket,
+  addDanmaku,
+  sendDanmaku,
+  getDanmakuByDiskId,
+  clearDanmakuByDiskId,
+  getCurrentDiskDanmaku,
 };
+
+export type { Danmaku };

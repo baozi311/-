@@ -1,0 +1,38 @@
+{
+  "danmaku": {
+    "1": [
+      {
+        "id": 1,
+        "diskId": 1,
+        "text": "这只股票涨得不错！",
+        "timestamp": "2026-03-18T10:00:00.000Z",
+        "color": "#ffffff",
+        "top": 10,
+        "duration": 10,
+        "count": 1
+      },
+      {
+        "id": 2,
+        "diskId": 1,
+        "text": "加仓加仓！",
+        "timestamp": "2026-03-18T10:01:00.000Z",
+        "color": "#ffeb3b",
+        "top": 20,
+        "duration": 8,
+        "count": 1
+      }
+    ],
+    "2": [
+      {
+        "id": 3,
+        "diskId": 2,
+        "text": "这盘走势不错",
+        "timestamp": "2026-03-18T11:00:00.000Z",
+        "color": "#00bcd4",
+        "top": 15,
+        "duration": 9,
+        "count": 1
+      }
+    ]
+  }
+}

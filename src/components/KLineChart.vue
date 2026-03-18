@@ -368,7 +368,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .chart-wrapper {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -378,6 +378,7 @@ onBeforeUnmount(() => {
   gap: 10px;
   padding: 10px;
   background-color: #1e222d;
+  flex-shrink: 0;
 }
 
 .chart-loading {
@@ -404,8 +405,12 @@ onBeforeUnmount(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .chart-controls button {
@@ -431,5 +436,6 @@ onBeforeUnmount(() => {
 #chart-container {
   flex: 1;
   overflow: hidden;
+  min-height: 0;
 }
 </style>

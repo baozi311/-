@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import KLineChart from "./components/KLineChart.vue";
 import StockSidebar from "./components/StockSidebar.vue";
 import HistorySidebar from "./components/HistorySidebar.vue";
+import DanmakuDisplay from "./components/DanmakuDisplay.vue";
+import { currentDiskId, diskList } from "./stores/stockStore";
 
 const leftCollapsed = ref(false);
 const rightCollapsed = ref(false);
 const isMobile = ref(false);
+const showDanmaku = ref(true);
+const danmakuRef = ref<InstanceType<typeof DanmakuDisplay> | null>(null);
+const activeDiskId = ref<number | null>(null);
 
 const checkMobile = () => {
   isMobile.value = window.innerWidth <= 768;
@@ -24,6 +29,30 @@ const toggleRight = () => {
   rightCollapsed.value = !rightCollapsed.value;
 };
 
+const handleSendDanmaku = (text: string) => {
+  if (danmakuRef.value) {
+    danmakuRef.value.addDanmaku(text);
+  }
+};
+
+const handleToggleDanmaku = (show: boolean) => {
+  showDanmaku.value = show;
+};
+
+const handleSelectDisk = (diskId: number | null) => {
+  activeDiskId.value = diskId;
+};
+
+const currentDisk = computed(() => {
+  if (currentDiskId.value === null) return null;
+  return diskList.value.find((d) => d.id === currentDiskId.value) || null;
+});
+
+const displayDiskId = computed(() => {
+  if (activeDiskId.value !== null) return activeDiskId.value;
+  return currentDiskId.value;
+});
+
 onMounted(() => {
   checkMobile();
   window.addEventListener("resize", checkMobile);
@@ -36,7 +65,10 @@ onUnmounted(() => {
 
 <template>
   <div class="app-container">
-    <HistorySidebar :collapsed="leftCollapsed" />
+    <HistorySidebar
+      :collapsed="leftCollapsed"
+      @select-disk="handleSelectDisk"
+    />
     <div
       v-if="isMobile && !leftCollapsed"
       class="sidebar-overlay left"
@@ -62,17 +94,20 @@ onUnmounted(() => {
           {{ rightCollapsed ? "«" : "»" }}
         </button>
       </div>
-      <!-- <div v-if="isMobile" class="mobile-controls">
-        <button @click="toggleLeft" class="mobile-btn">
-          {{ "☰ 盘" }}
-        </button>
-        <button @click="toggleRight" class="mobile-btn">
-          {{ "☰ 信息" }}
-        </button>
-      </div> -->
-      <KLineChart />
+      <div class="chart-wrapper">
+        <KLineChart />
+        <DanmakuDisplay
+          ref="danmakuRef"
+          :showDanmaku="showDanmaku"
+          :diskId="displayDiskId"
+        />
+      </div>
     </div>
-    <StockSidebar :collapsed="rightCollapsed" />
+    <StockSidebar
+      :collapsed="rightCollapsed"
+      @send-danmaku="handleSendDanmaku"
+      @toggle-danmaku="handleToggleDanmaku"
+    />
   </div>
 </template>
 
@@ -95,6 +130,12 @@ onUnmounted(() => {
   transition:
     margin-left 0.3s ease,
     margin-right 0.3s ease;
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .mobile-controls {

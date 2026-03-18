@@ -135,6 +135,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   (e: "toggle"): void;
+  (e: "select-disk", diskId: number | null): void;
 }>();
 
 interface HistoryItem {
@@ -208,6 +209,7 @@ async function loadAllData() {
 async function switchToCurrentDisk() {
   activeTab.value = "current";
   selectedIndex.value = 0;
+  emit("select-disk", null);
   await loadHistoryData();
   await loadKlineData();
 }
@@ -215,7 +217,7 @@ async function switchToCurrentDisk() {
 async function selectDisk(diskId: number) {
   activeTab.value = "disk-" + diskId;
   selectedIndex.value = 0;
-  // await loadDiskData(diskId);
+  emit("select-disk", diskId);
   await loadDiskKline(diskId);
 }
 

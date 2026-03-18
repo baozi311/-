@@ -60,12 +60,40 @@
           </div>
         </template>
       </div>
+
+      <div class="danmaku-section">
+        <div class="danmaku-header">
+          <span class="danmaku-title">弹幕</span>
+          <div class="danmaku-status">
+            <span
+              v-if="currentDisk && currentDisk.isClosed"
+              class="disk-closed-badge"
+              >已封盘</span
+            >
+            <button @click="toggleDanmaku" class="btn-toggle-danmaku">
+              {{ showDanmaku ? "隐藏" : "显示" }}
+            </button>
+          </div>
+        </div>
+        <div class="danmaku-buttons">
+          <button
+            v-for="danmaku in presetDanmaku"
+            :key="danmaku"
+            @click="sendPresetDanmaku(danmaku)"
+            :disabled="!canSendDanmaku"
+            class="danmaku-button"
+            :class="{ disabled: !canSendDanmaku }"
+          >
+            {{ danmaku }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import {
   stockData,
   historyData,
@@ -76,6 +104,9 @@ import {
   formattedUnitPrice,
   loadStockData,
   loadHistoryData,
+  currentDiskId,
+  diskList,
+  sendDanmaku as sendDanmakuToServer,
 } from "../stores/stockStore";
 
 interface Props {
@@ -88,13 +119,59 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   (e: "toggle"): void;
+  (e: "send-danmaku", text: string): void;
+  (e: "toggle-danmaku", show: boolean): void;
 }>();
 
-// 股票基本信息
+const danmakuText = ref("");
+const showDanmaku = ref(true);
+
+// 预设弹幕
+const presetDanmaku = [
+  "会不会我跑了他就涨啊",
+  "这股最好是早似喵",
+  "猫猫招手",
+  "史",
+  "被做局了",
+  "观望中",
+  "冲啊！",
+  "稳了稳了",
+  "回调了回调了",
+  "牛市要来了",
+];
+
+const currentDisk = computed(() => {
+  if (currentDiskId.value === null) return null;
+  return diskList.value.find((d) => d.id === currentDiskId.value) || null;
+});
+
+const canSendDanmaku = computed(() => {
+  return currentDisk.value && !currentDisk.value.isClosed;
+});
+
+function sendDanmaku() {
+  if (danmakuText.value.trim() && currentDiskId.value !== null) {
+    sendDanmakuToServer(currentDiskId.value, danmakuText.value);
+    emit("send-danmaku", danmakuText.value);
+    danmakuText.value = "";
+  }
+}
+
+function sendPresetDanmaku(text: string) {
+  if (currentDiskId.value !== null) {
+    sendDanmakuToServer(currentDiskId.value, text);
+    emit("send-danmaku", text);
+  }
+}
+
+function toggleDanmaku() {
+  showDanmaku.value = !showDanmaku.value;
+  emit("toggle-danmaku", showDanmaku.value);
+}
+
 const symbol = "IIROSE";
 const name = "Rosebush Garden";
 
-// 计算涨跌（使用历史数据）
 const priceChange = computed(() => {
   if (historyData.value.length < 2) return 0;
   const latest = historyData.value[historyData.value.length - 1];
@@ -121,12 +198,10 @@ function toFixed4(value: number): string {
   return parts[0] + "." + parts[1].padEnd(4, "0").slice(0, 4);
 }
 
-// 从stockStore获取数据
 const totalStock = computed(() => stockData.totalStock);
 const personalStock = computed(() => stockData.personalStock);
 const lastUpdated = computed(() => stockData.lastUpdated);
 
-// 组件挂载时加载数据
 onMounted(() => {
   loadStockData();
   loadHistoryData();
@@ -324,5 +399,109 @@ onMounted(() => {
 
 .stock-sidebar::-webkit-scrollbar-thumb:hover {
   background: #363a45;
+}
+
+.danmaku-section {
+  padding: 20px;
+  border-top: 1px solid #2a2e39;
+}
+
+.danmaku-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.danmaku-title {
+  color: #d1d4dc;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.danmaku-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.disk-closed-badge {
+  background-color: #ef5350;
+  color: #fff;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.btn-toggle-danmaku {
+  padding: 4px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #2a2e39;
+  color: #d1d4dc;
+}
+
+.btn-toggle-danmaku:hover {
+  background-color: #363a45;
+}
+
+.danmaku-input-wrapper {
+  display: flex;
+  gap: 8px;
+}
+
+.danmaku-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #2a2e39;
+  border-radius: 4px;
+  background-color: #131722;
+  color: #d1d4dc;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.danmaku-input:focus {
+  border-color: #26a69a;
+}
+
+.danmaku-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.danmaku-button {
+  padding: 8px 12px;
+  border: 1px solid #2a2e39;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #131722;
+  color: #d1d4dc;
+  text-align: center;
+}
+
+.danmaku-button:hover:not(:disabled) {
+  background-color: #26a69a;
+  border-color: #26a69a;
+  color: #131722;
+}
+
+.danmaku-button.disabled {
+  background-color: #0d0f14;
+  color: #787b86;
+  border-color: #2a2e39;
+  cursor: not-allowed;
+}
+
+.danmaku-input::placeholder {
+  color: #787b86;
 }
 </style>
