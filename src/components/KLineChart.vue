@@ -1,5 +1,10 @@
+<!--
+ * K线图组件
+ * 负责显示股票的K线图和折线图
+-->
 <template>
   <div class="chart-wrapper">
+    <!-- 图表控制按钮 -->
     <div class="chart-controls">
       <button
         :class="{ active: chartType === 'kline' }"
@@ -13,11 +18,34 @@
       >
         折线
       </button>
+      <!-- AI分析结果 -->
+      <!-- <div class="ai-analysis-info" v-if="aiAnalysisResult">
+        <div class="ai-analysis-details">
+          <div class="ai-detail-item">
+            <span class="label">预测价格</span>
+            <span class="value">{{
+              toFixed4(aiAnalysisResult.nextPrice)
+            }}</span>
+          </div>
+          <div class="ai-detail-item">
+            <span class="label">预测趋势</span>
+            <span class="value" :class="aiAnalysisResult.trend">{{
+              aiAnalysisResult.trend == "上涨" ? "上涨" : "下跌"
+            }}</span>
+          </div>
+          <div class="ai-detail-item">
+            <span class="label">准确率</span>
+            <span class="value">{{ aiAnalysisResult.accuracy }}%</span>
+          </div>
+        </div>
+      </div> -->
     </div>
+    <!-- 加载状态 -->
     <div v-if="klineLoading" class="chart-loading">
       <div class="loading-spinner"></div>
       <span>加载中...</span>
     </div>
+    <!-- 图表容器 -->
     <div id="chart-container" ref="chartContainer"></div>
   </div>
 </template>
@@ -32,19 +60,42 @@ import {
   loadKlineData,
   klineLoading,
   klineError,
+  aiAnalysisResult,
 } from "../stores/stockStore";
 
+// 图表容器引用
 const chartContainer = ref<HTMLElement | null>(null);
+// ECharts实例
 let myChart: echarts.ECharts | null = null;
+// 图表类型
 const chartType = ref<"kline" | "line">("kline");
 
+// 上涨颜色
 const upColor = "#26a69a";
+// 下跌颜色
 const downColor = "#ef5350";
 
+/**
+ * 将数字格式化为4位小数
+ * @param value 要格式化的数字
+ * @returns 格式化后的字符串
+ */
+function toFixed4(value: number): string {
+  const str = String(value);
+  const parts = str.split(".");
+  if (parts.length === 1) return parts[0] + ".0000";
+  return parts[0] + "." + parts[1].padEnd(4, "0").slice(0, 4);
+}
+
+/**
+ * 分割数据
+ * @param rawData 原始数据
+ * @returns 分割后的数据
+ */
 function splitData(rawData: (string | number)[][]) {
-  const categoryData: string[] = [];
-  const values: number[][] = [];
-  const volumes: number[][] = [];
+  const categoryData: string[] = []; // 类别数据（时间）
+  const values: number[][] = []; // K线数据
+  const volumes: number[][] = []; // 成交量数据
   for (let i = 0; i < rawData.length; i++) {
     const item = [...rawData[i]];
     categoryData.push(item.shift() as string);
@@ -54,6 +105,11 @@ function splitData(rawData: (string | number)[][]) {
   return { categoryData, values, volumes };
 }
 
+/**
+ * 创建K线图配置
+ * @param data 分割后的数据
+ * @returns K线图配置
+ */
 function createKlineOption(data: {
   categoryData: string[];
   values: number[][];
@@ -159,6 +215,11 @@ function createKlineOption(data: {
   };
 }
 
+/**
+ * 创建折线图配置
+ * @param data 分割后的数据
+ * @returns 折线图配置
+ */
 function createLineOption(data: {
   categoryData: string[];
   values: number[][];
@@ -269,6 +330,10 @@ function createLineOption(data: {
   };
 }
 
+/**
+ * 创建图表配置
+ * @returns 图表配置
+ */
 function createOption() {
   const rawData =
     klineData.value.length > 0 ? klineData.value : generateDefaultKLineData();
@@ -280,7 +345,10 @@ function createOption() {
   return createKlineOption(data);
 }
 
-// 生成默认K线数据（当服务器没有数据时使用）
+/**
+ * 生成默认K线数据（当服务器没有数据时使用）
+ * @returns 默认K线数据
+ */
 function generateDefaultKLineData() {
   const basePrice = stockData.unitPrice || 10.5;
   const rawData: (string | number)[][] = [];
@@ -305,12 +373,18 @@ function generateDefaultKLineData() {
   return rawData;
 }
 
+/**
+ * 处理窗口大小变化
+ */
 const handleResize = () => {
   if (myChart && chartContainer.value) {
     myChart.resize();
   }
 };
 
+/**
+ * 更新图表
+ */
 function updateChart() {
   if (myChart) {
     const option = createOption();
@@ -342,7 +416,9 @@ watch(
   },
 );
 
+// 组件挂载时初始化图表
 onMounted(() => {
+  console.log(397, aiAnalysisResult.value);
   if (chartContainer.value) {
     const isMobile = window.innerWidth <= 768;
     const width = chartContainer.value.clientWidth + (isMobile ? 0 : 40);
@@ -357,6 +433,7 @@ onMounted(() => {
   }
 });
 
+// 组件卸载前清理
 onBeforeUnmount(() => {
   if (myChart) {
     myChart.dispose();
@@ -366,6 +443,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+/* 图表包装器 */
 .chart-wrapper {
   width: 100%;
   height: 100%;
@@ -373,14 +451,57 @@ onBeforeUnmount(() => {
   flex-direction: column;
 }
 
+/* 图表控制按钮 */
 .chart-controls {
   display: flex;
   gap: 10px;
   padding: 10px;
   background-color: #1e222d;
   flex-shrink: 0;
+  align-items: center;
 }
 
+/* AI分析结果 */
+.ai-analysis-info {
+  margin-left: auto;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.ai-analysis-details {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.ai-detail-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.ai-detail-item .label {
+  color: #787b86;
+  font-size: 10px;
+}
+
+.ai-detail-item .value {
+  color: #d1d4dc;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.ai-detail-item .value.上涨 {
+  color: #26a69a;
+}
+
+.ai-detail-item .value.下跌 {
+  color: #ef5350;
+}
+
+/* 加载状态 */
 .chart-loading {
   position: absolute;
   top: 50%;
@@ -395,6 +516,7 @@ onBeforeUnmount(() => {
   z-index: 100;
 }
 
+/* 加载动画 */
 .loading-spinner {
   width: 40px;
   height: 40px;
@@ -413,6 +535,7 @@ onBeforeUnmount(() => {
   }
 }
 
+/* 控制按钮样式 */
 .chart-controls button {
   padding: 8px 20px;
   border: none;
@@ -433,6 +556,7 @@ onBeforeUnmount(() => {
   color: #131722;
 }
 
+/* 图表容器 */
 #chart-container {
   flex: 1;
   overflow: hidden;

@@ -1,12 +1,20 @@
+/*
+ * 全局样式定义
+ * 负责设置整个应用的基础样式和主题
+ */
+
 :root {
+  /* 字体设置 */
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
+  /* 颜色方案 */
   color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #131722;
 
+  /* 字体渲染优化 */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -14,12 +22,14 @@
   -webkit-text-size-adjust: 100%;
 }
 
+/* 全局重置 */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/*  body样式设置 */
 body {
   margin: 0;
   padding: 0;
@@ -28,6 +38,7 @@ body {
   background-color: #131722;
 }
 
+/* 应用容器样式 */
 #app {
   width: 100%;
   height: 100vh;

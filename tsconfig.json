@@ -1,25 +1,25 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "skipLibCheck": true,
+    "target": "ES2020", // 目标ECMAScript版本
+    "useDefineForClassFields": true, // 使用defineProperty定义类字段
+    "module": "ESNext", // 模块系统
+    "lib": ["ES2020", "DOM", "DOM.Iterable"], // 包含的库
+    "skipLibCheck": true, // 跳过库文件的类型检查
 
     /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "preserve",
+    "moduleResolution": "bundler", // 模块解析方式
+    "allowImportingTsExtensions": true, // 允许导入.ts文件时使用扩展名
+    "resolveJsonModule": true, // 允许导入JSON模块
+    "isolatedModules": true, // 启用隔离模块
+    "noEmit": true, // 不生成输出文件
+    "jsx": "preserve", // JSX处理方式
 
     /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "strict": true, // 启用严格模式
+    "noUnusedLocals": true, // 不允许未使用的局部变量
+    "noUnusedParameters": true, // 不允许未使用的参数
+    "noFallthroughCasesInSwitch": true // 不允许switch语句中的fallthrough
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"], // 包含的文件
+  "references": [{ "path": "./tsconfig.node.json" }] // 引用的其他配置文件
 }

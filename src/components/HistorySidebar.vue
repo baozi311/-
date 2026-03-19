@@ -1,9 +1,14 @@
+<!--
+ * 历史侧边栏组件
+ * 负责显示股票盘的历史数据和封存盘列表
+-->
 <template>
   <div class="history-sidebar" :class="{ collapsed }">
     <!-- <button class="toggle-btn" @click="emit('toggle')">
       {{ collapsed ? "»" : "«" }}
     </button> -->
     <div class="sidebar-content" v-show="!collapsed">
+      <!-- 侧边栏头部 -->
       <div class="sidebar-header">
         <h3>股票盘</h3>
         <button
@@ -81,7 +86,7 @@
             </div>
             <div class="disk-stats">
               <span class="disk-time"
-                >{{ formatTime(disk.startTime, true) }} -
+                >{{ formatTime(disk.startTime, true) }} - 
                 {{ formatTime(disk.endTime, true) }}</span
               >
             </div>
@@ -125,56 +130,88 @@ import {
   loadStockData,
 } from "../stores/stockStore";
 
+/**
+ * 组件属性接口
+ */
 interface Props {
-  collapsed?: boolean;
+  collapsed?: boolean;    // 是否折叠
 }
 
+// 定义组件属性
 const props = withDefaults(defineProps<Props>(), {
-  collapsed: false,
+  collapsed: false,       // 默认不折叠
 });
 
+// 定义组件事件
 const emit = defineEmits<{
-  (e: "toggle"): void;
-  (e: "select-disk", diskId: number | null): void;
+  (e: "toggle"): void;                  // 切换折叠状态
+  (e: "select-disk", diskId: number | null): void; // 选择股票盘
 }>();
 
+/**
+ * 历史数据项接口
+ */
 interface HistoryItem {
-  date: string;
-  time: string;
-  open: number;
-  close: number;
-  high: number;
-  low: number;
-  change: number;
-  changePercent: number;
-  volume: number;
-  timestamp?: string;
+  date: string;             // 日期
+  time: string;             // 时间
+  open: number;             // 开盘价
+  close: number;            // 收盘价
+  high: number;             // 最高价
+  low: number;              // 最低价
+  change: number;           // 涨跌额
+  changePercent: number;    // 涨跌幅
+  volume: number;           // 成交量
+  timestamp?: string;       // 时间戳
 }
 
+// 选中的历史数据索引
 const selectedIndex = ref(0);
+// 当前活动的标签
 const activeTab = ref("current");
 
+/**
+ * 计算封存盘列表
+ */
 const closedDisks = computed(() => {
   return diskList.value
     .filter((disk) => disk.isClosed)
-    .sort((a, b) => b.id - a.id);
+    .sort((a, b) => b.id - a.id); // 按ID降序排序
 });
 
+/**
+ * 计算最新数据
+ */
 const latestData = computed(() => {
   if (formattedHistoryData.value.length === 0) return null;
   return formattedHistoryData.value[formattedHistoryData.value.length - 1];
 });
 
+/**
+ * 格式化日期
+ * @param dateStr 日期字符串
+ * @returns 格式化后的日期
+ */
 function formatDate(dateStr: string) {
   const date = new Date(dateStr);
   return date.toLocaleDateString("zh-CN");
 }
 
+/**
+ * 格式化日期时间
+ * @param dateStr 日期字符串
+ * @returns 格式化后的日期时间
+ */
 function formatDateTime(dateStr: string) {
   const date = new Date(dateStr);
   return date.toLocaleString("zh-CN");
 }
 
+/**
+ * 格式化时间
+ * @param dateStr 日期字符串
+ * @param includeSeconds 是否包含秒
+ * @returns 格式化后的时间
+ */
 function formatTime(
   dateStr: string | undefined,
   includeSeconds: boolean = false,
@@ -188,10 +225,20 @@ function formatTime(
   return time.slice(0, 5);
 }
 
+/**
+ * 格式化金额
+ * @param amount 金额
+ * @returns 格式化后的金额
+ */
 function formatMoney(amount: number): string {
   return amount.toLocaleString("zh-CN");
 }
 
+/**
+ * 将数字格式化为4位小数
+ * @param value 要格式化的数字
+ * @returns 格式化后的字符串
+ */
 function toFixed4(value: number | undefined | null): string {
   if (value === undefined || value === null) return "0.0000";
   const str = String(value);
@@ -200,12 +247,18 @@ function toFixed4(value: number | undefined | null): string {
   return parts[0] + "." + parts[1].padEnd(4, "0").slice(0, 4);
 }
 
+/**
+ * 加载所有数据
+ */
 async function loadAllData() {
   await loadDiskList();
   await loadHistoryData();
   await loadStockData();
 }
 
+/**
+ * 切换到当前盘
+ */
 async function switchToCurrentDisk() {
   activeTab.value = "current";
   selectedIndex.value = 0;
@@ -214,6 +267,10 @@ async function switchToCurrentDisk() {
   await loadKlineData();
 }
 
+/**
+ * 选择股票盘
+ * @param diskId 股票盘ID
+ */
 async function selectDisk(diskId: number) {
   activeTab.value = "disk-" + diskId;
   selectedIndex.value = 0;
@@ -221,6 +278,9 @@ async function selectDisk(diskId: number) {
   await loadDiskKline(diskId);
 }
 
+/**
+ * 格式化历史数据
+ */
 const formattedHistoryData = computed(() => {
   return historyData.value.map((item, index) => {
     const prevItem = historyData.value[index - 1];
@@ -245,18 +305,24 @@ const formattedHistoryData = computed(() => {
   });
 });
 
+/**
+ * 选择历史数据
+ * @param index 历史数据索引
+ */
 function selectHistory(index: number) {
   selectedIndex.value = index;
   console.log("Selected history index:", index);
   console.log("Selected history data:", formattedHistoryData.value[index]);
 }
 
+// 组件挂载时加载数据
 onMounted(() => {
   loadAllData();
 });
 </script>
 
 <style scoped>
+/* 历史侧边栏 */
 .history-sidebar {
   width: 280px;
   background-color: #1e222d;
@@ -270,10 +336,12 @@ onMounted(() => {
   transition: width 0.3s ease;
 }
 
+/* 折叠状态 */
 .history-sidebar.collapsed {
   width: 00px;
 }
 
+/* 切换按钮 */
 .toggle-btn {
   position: absolute;
   right: -20px;
@@ -298,6 +366,7 @@ onMounted(() => {
   background-color: #363a45;
 }
 
+/* 侧边栏头部 */
 .sidebar-header {
   padding: 20px;
   border-bottom: 1px solid #2a2e39;
@@ -314,6 +383,7 @@ onMounted(() => {
   font-weight: 600;
 }
 
+/* 刷新按钮 */
 .btn-refresh {
   padding: 6px 12px;
   border: none;
@@ -334,6 +404,7 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
+/* 盘标签 */
 .disk-tabs {
   display: flex;
   padding: 12px;
@@ -381,6 +452,7 @@ onMounted(() => {
   font-weight: 600;
 }
 
+/* 封存盘部分 */
 .closed-disks-section {
   border-bottom: 1px solid #2a2e39;
 }
@@ -397,6 +469,7 @@ onMounted(() => {
   padding: 0 12px 12px;
 }
 
+/* 盘项 */
 .disk-item {
   background-color: #131722;
   border-radius: 8px;
@@ -419,6 +492,7 @@ onMounted(() => {
   box-shadow: 0 2px 8px rgba(38, 166, 154, 0.2);
 }
 
+/* 盘头部 */
 .disk-header {
   display: flex;
   justify-content: space-between;
@@ -441,6 +515,7 @@ onMounted(() => {
   font-weight: 600;
 }
 
+/* 盘统计信息 */
 .disk-stats {
   margin-bottom: 10px;
   padding: 8px;
@@ -455,6 +530,7 @@ onMounted(() => {
   font-weight: 700;
 }
 
+/* 盘价格范围 */
 .disk-price-range {
   display: flex;
   justify-content: space-between;
@@ -481,6 +557,7 @@ onMounted(() => {
   color: #ef5350;
 }
 
+/* 当前盘数据 */
 .current-disk-data {
   padding: 0;
 }
@@ -496,6 +573,7 @@ onMounted(() => {
   font-weight: 600;
 }
 
+/* 股票信息卡片 */
 .stock-info-card {
   padding: 16px;
 }
@@ -529,6 +607,7 @@ onMounted(() => {
   font-weight: 700;
 }
 
+/* 加载、错误和空消息 */
 .loading-message,
 .error-message,
 .empty-message {
@@ -546,10 +625,12 @@ onMounted(() => {
   border-radius: 4px;
 }
 
+/* 历史列表 */
 .history-list {
   padding: 12px;
 }
 
+/* 历史项 */
 .history-item {
   background-color: #131722;
   border-radius: 8px;
@@ -570,6 +651,7 @@ onMounted(() => {
   border-color: #26a69a;
 }
 
+/* 日期部分 */
 .date-section {
   display: flex;
   justify-content: space-between;
@@ -613,6 +695,7 @@ onMounted(() => {
   font-size: 12px;
 }
 
+/* 价格部分 */
 .price-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -637,6 +720,7 @@ onMounted(() => {
   font-weight: 500;
 }
 
+/* 涨跌部分 */
 .change-section {
   display: flex;
   align-items: center;
@@ -662,6 +746,7 @@ onMounted(() => {
   font-size: 12px;
 }
 
+/* 滚动条样式 */
 .history-sidebar::-webkit-scrollbar {
   width: 6px;
 }
