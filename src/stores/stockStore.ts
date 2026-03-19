@@ -183,6 +183,17 @@ function handleWebSocketMessage(message: any) {
       break;
     case 'danmaku':
       if (message.data && message.data.diskId !== undefined && message.data.text) {
+        // 检查是否已经存在相同文本的弹幕
+        if (danmakuMap.value.has(message.data.diskId)) {
+          const existingDanmaku = danmakuMap.value.get(message.data.diskId)!.find(d => d.text === message.data.text);
+          if (existingDanmaku) {
+            // 增加计数
+            existingDanmaku.count++;
+            existingDanmaku.timestamp = message.data.timestamp || new Date().toISOString();
+            return;
+          }
+        }
+        
         const danmaku: Danmaku = {
           id: message.data.id || danmakuIdCounter.value++,
           diskId: message.data.diskId,
@@ -191,6 +202,7 @@ function handleWebSocketMessage(message: any) {
           color: message.data.color || getRandomColor(),
           top: message.data.top !== undefined ? message.data.top : getRandomTop(),
           duration: message.data.duration !== undefined ? message.data.duration : getRandomDuration(),
+          count: message.data.count || 1,
         };
         
         if (!danmakuMap.value.has(danmaku.diskId)) {

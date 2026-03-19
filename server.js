@@ -47,6 +47,60 @@ wss.on('connection', (ws) => {
     currentDiskId: currentDisk ? currentDisk.id : null
   }))
 
+  ws.on('message', (message) => {
+    try {
+      const data = JSON.parse(message)
+      if (data.type === 'danmaku') {
+        console.log('收到弹幕:', data.data)
+        
+        const danmaku = data.data
+        const diskId = danmaku.diskId
+        
+        if (diskId !== undefined) {
+          // 找到或创建对应盘的弹幕列表
+          let diskDanmaku = danmakuData.danmakuDisks.find(d => d.diskId === diskId)
+          if (!diskDanmaku) {
+            diskDanmaku = {
+              diskId: diskId,
+              danmakuList: []
+            }
+            danmakuData.danmakuDisks.push(diskDanmaku)
+          }
+          
+          // 检查是否已存在相同文本的弹幕
+          const existingDanmaku = diskDanmaku.danmakuList.find(d => d.text === danmaku.text)
+          if (existingDanmaku) {
+            // 增加计数
+            existingDanmaku.count = (existingDanmaku.count || 1) + 1
+            existingDanmaku.timestamp = new Date().toISOString()
+          } else {
+            // 添加新弹幕
+            diskDanmaku.danmakuList.push({
+              id: Date.now(),
+              text: danmaku.text,
+              timestamp: new Date().toISOString(),
+              color: danmaku.color,
+              top: danmaku.top,
+              duration: danmaku.duration,
+              count: 1
+            })
+          }
+          
+          // 保存弹幕数据
+          saveDanmakuData()
+          
+          // 广播给所有客户端
+          broadcast({
+            type: 'danmaku',
+            data: danmaku
+          })
+        }
+      }
+    } catch (error) {
+      console.error('处理WebSocket消息失败:', error)
+    }
+  })
+
   ws.on('close', () => {
     console.log('WebSocket连接关闭')
     clients.delete(ws)
@@ -65,6 +119,7 @@ function broadcast(message) {
 
 // 数据文件路径
 const DATA_FILE = path.join(process.cwd(), 'stock-data.json')
+const DANMAKU_FILE = path.join(process.cwd(), 'danmaku-data.json')
 
 // 中间件
 app.use(express.json())
@@ -102,6 +157,11 @@ let stockDisks = []
 // 当前活跃的盘
 let currentDisk = null
 
+// 弹幕数据
+let danmakuData = {
+  danmakuDisks: []
+}
+
 // 保存数据到文件
 function saveData() {
   try {
@@ -113,6 +173,16 @@ function saveData() {
     // console.log('数据已保存到文件')
   } catch (error) {
     console.error('保存数据失败:', error)
+  }
+}
+
+// 保存弹幕数据到文件
+function saveDanmakuData() {
+  try {
+    fs.writeFileSync(DANMAKU_FILE, JSON.stringify(danmakuData, null, 2), 'utf-8')
+    // console.log('弹幕数据已保存到文件')
+  } catch (error) {
+    console.error('保存弹幕数据失败:', error)
   }
 }
 
@@ -147,6 +217,22 @@ function loadData() {
     console.error('加载数据失败:', error)
     stockDisks = []
     currentDisk = null
+  }
+  
+  // 加载弹幕数据
+  try {
+    if (fs.existsSync(DANMAKU_FILE)) {
+      const data = JSON.parse(fs.readFileSync(DANMAKU_FILE, 'utf-8'))
+      danmakuData = data
+      console.log(`从文件加载了 ${danmakuData.danmakuDisks.length} 个盘的弹幕数据`)
+    } else {
+      console.log('没有找到弹幕数据文件，将创建新数据')
+      danmakuData = { danmakuDisks: [] }
+      saveDanmakuData()
+    }
+  } catch (error) {
+    console.error('加载弹幕数据失败:', error)
+    danmakuData = { danmakuDisks: [] }
   }
 }
 
@@ -514,6 +600,35 @@ app.get('/health', (req, res) => {
     uptime: process.uptime(),
     currentDiskId: currentDisk ? currentDisk.id : null,
     totalDisks: stockDisks.length
+  })
+})
+
+// 获取弹幕数据
+app.get('/danmaku', (req, res) => {
+  res.json({
+    success: true,
+    data: danmakuData
+  })
+})
+
+// 获取指定盘的弹幕数据
+app.get('/danmaku/:diskId', (req, res) => {
+  const diskId = parseInt(req.params.diskId)
+  const diskDanmaku = danmakuData.danmakuDisks.find(d => d.diskId === diskId)
+  
+  if (!diskDanmaku) {
+    return res.json({
+      success: true,
+      data: {
+        diskId: diskId,
+        danmakuList: []
+      }
+    })
+  }
+  
+  res.json({
+    success: true,
+    data: diskDanmaku
   })
 })
 
