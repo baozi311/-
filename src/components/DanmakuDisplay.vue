@@ -68,11 +68,13 @@ function loadDanmakuForDisk(diskId: number | null) {
 
   const storeDanmakuList = danmakuMap.value.get(diskId) || [];
 
-  // 分批加载弹幕，每隔300ms加载一个
+  // 错位显示弹幕，每个弹幕有不同的延迟时间
   storeDanmakuList.forEach((storeDanmaku, index) => {
+    // 为每个弹幕添加随机延迟，范围在0-2000ms之间
+    const delay = index * 100 + Math.random() * 1000;
     setTimeout(() => {
       displaySingleDanmaku(storeDanmaku);
-    }, index * 1000);
+    }, delay);
   });
 }
 
