@@ -7,7 +7,7 @@ import express from 'express' // Express框架
 import { stockDisks, currentDisk, isCrashData, createNewDisk, closeCurrentDisk, getDanmakuForDisk, danmakuData, saveData } from '../data/index.js' // 数据管理
 import { broadcastStockUpdate, broadcastDiskCreated, broadcastDiskClosed } from '../websocket/index.js' // WebSocket广播
 import { CRASH_DATA } from '../config/index.js' // 配置参数
-import { callDeepSeek, analyzeStockData } from '../ai/index.js' // DeepSeek大模型
+// import { callDeepSeek, analyzeStockData, generateDanmaku } from '../ai/index.js' // DeepSeek大模型
 
 const router = express.Router() // 创建路由器实例
 
@@ -262,10 +262,11 @@ router.get('/stock/kline', (req, res) => {
   })
 })
 
-/**
+/*
  * AI分析接口 - 返回股票数据供AI分析预测
  * @returns {Object} AI分析数据
  */
+/*
 router.get('/ai/analysis', (req, res) => {
   if (!currentDisk || currentDisk.data.length === 0) {
     return res.json({
@@ -466,41 +467,9 @@ router.post('/stock', async (req, res) => {
       // console.log(`数据已添加到盘 #${currentDisk.id}`)
       saveData()
 
-      // 准备AI分析数据，包含当前盘的所有数据
-      const analysisData = {
-        diskId: currentDisk.id,
-        startTime: currentDisk.startTime,
-        isClosed: currentDisk.isClosed,
-        data: currentDisk.data, // 包含当前盘的所有数据
-        latest: {
-          unitPrice: dataWithTimestamp.unitPrice,
-          totalStock: dataWithTimestamp.totalStock,
-          totalMoney: dataWithTimestamp.totalMoney,
-          timestamp: dataWithTimestamp.timestamp
-        },
-        statistics: {
-          highPrice: currentDisk.highPrice || null,
-          lowPrice: currentDisk.lowPrice || null,
-          maxStock: currentDisk.maxStock || null,
-          minStock: currentDisk.minStock || null,
-          totalRecords: currentDisk.data.length
-        }
-      }
-
-      // 进行AI分析
-      let aiAnalysis = null
-      try {
-        aiAnalysis = await analyzeStockData(analysisData)
-        console.log('AI分析结果:', aiAnalysis)
-      } catch (error) {
-        console.error('AI分析失败:', error)
-        // AI分析失败不影响股票数据的处理
-      }
-
-      // 广播给所有客户端，包含AI分析结果
+      // 广播给所有客户端
       broadcastStockUpdate({
-        ...dataWithTimestamp,
-        // aiAnalysis: aiAnalysis
+        ...dataWithTimestamp
       }, currentDisk.id)
     }
 

@@ -5,7 +5,7 @@
 
 import { WebSocketServer } from 'ws' // WebSocket服务器
 import { currentDisk, stockDisks, addDanmaku, danmakuData } from '../data/index.js' // 数据管理
-import { analyzeStockData } from '../ai/index.js' // AI分析
+// import { analyzeStockData } from '../ai/index.js' // AI分析
 
 // 存储所有连接的客户端
 const clients = new Set()
@@ -22,7 +22,7 @@ function initWebSocket(server) {
   wss = new WebSocketServer({ server })
 
   // WebSocket连接处理
-  wss.on('connection', async (ws) => {
+  wss.on('connection', (ws) => {
     console.log('新的WebSocket连接')
     clients.add(ws)
 
@@ -30,43 +30,10 @@ function initWebSocket(server) {
     if (currentDisk && currentDisk.data.length > 0) {
       const latestData = currentDisk.data[currentDisk.data.length - 1]
 
-      // 准备AI分析数据
-      const analysisData = {
-        diskId: currentDisk.id,
-        startTime: currentDisk.startTime,
-        isClosed: currentDisk.isClosed,
-        data: currentDisk.data,
-        latest: {
-          unitPrice: latestData.unitPrice,
-          totalStock: latestData.totalStock,
-          totalMoney: latestData.totalMoney,
-          timestamp: latestData.timestamp
-        },
-        statistics: {
-          highPrice: currentDisk.highPrice || null,
-          lowPrice: currentDisk.lowPrice || null,
-          maxStock: currentDisk.maxStock || null,
-          minStock: currentDisk.minStock || null,
-          totalRecords: currentDisk.data.length
-        }
-      }
-
-      // 进行AI分析
-      let aiAnalysis = null
-      try {
-        aiAnalysis = await analyzeStockData(analysisData)
-        console.log('AI分析结果:', aiAnalysis)
-      } catch (error) {
-        console.error('AI分析失败:', error)
-      }
-
-      // 发送股票数据和AI分析结果
+      // 发送股票数据
       ws.send(JSON.stringify({
         type: 'stock_update',
-        data: {
-          ...latestData,
-          // aiAnalysis: aiAnalysis
-        },
+        data: latestData,
         diskId: currentDisk.id
       }))
     }
