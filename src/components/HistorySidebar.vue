@@ -86,7 +86,7 @@
             </div>
             <div class="disk-stats">
               <span class="disk-time"
-                >{{ formatTime(disk.startTime, true) }} - 
+                >{{ formatTime(disk.startTime, true) }} -
                 {{ formatTime(disk.endTime, true) }}</span
               >
             </div>
@@ -135,17 +135,17 @@ import {
  * 组件属性接口
  */
 interface Props {
-  collapsed?: boolean;    // 是否折叠
+  collapsed?: boolean; // 是否折叠
 }
 
 // 定义组件属性
 const props = withDefaults(defineProps<Props>(), {
-  collapsed: false,       // 默认不折叠
+  collapsed: false, // 默认不折叠
 });
 
 // 定义组件事件
 const emit = defineEmits<{
-  (e: "toggle"): void;                  // 切换折叠状态
+  (e: "toggle"): void; // 切换折叠状态
   (e: "select-disk", diskId: number | null): void; // 选择股票盘
 }>();
 
@@ -153,16 +153,16 @@ const emit = defineEmits<{
  * 历史数据项接口
  */
 interface HistoryItem {
-  date: string;             // 日期
-  time: string;             // 时间
-  open: number;             // 开盘价
-  close: number;            // 收盘价
-  high: number;             // 最高价
-  low: number;              // 最低价
-  change: number;           // 涨跌额
-  changePercent: number;    // 涨跌幅
-  volume: number;           // 成交量
-  timestamp?: string;       // 时间戳
+  date: string; // 日期
+  time: string; // 时间
+  open: number; // 开盘价
+  close: number; // 收盘价
+  high: number; // 最高价
+  low: number; // 最低价
+  change: number; // 涨跌额
+  changePercent: number; // 涨跌幅
+  volume: number; // 成交量
+  timestamp?: string; // 时间戳
 }
 
 // 选中的历史数据索引
