@@ -5,6 +5,7 @@
 
 import { WebSocketServer } from 'ws'
 import { currentDisk, stockDisks, addDanmaku, danmakuData } from '../data/index.js'
+import { encrypt, decrypt } from '../utils/index.js'
 
 const clients = new Set()
 
@@ -28,16 +29,17 @@ function initWebSocket(server) {
     if (currentDisk && currentDisk.data.length > 0) {
       const latestData = currentDisk.data[currentDisk.data.length - 1]
 
-      // 发送股票数据
-      ws.send(JSON.stringify({
+      // 发送股票数据（加密）
+      const message = JSON.stringify({
         type: 'stock_update',
         data: latestData,
         diskId: currentDisk.id
-      }))
+      });
+      ws.send('ENCRYPTED:' + encrypt(message));
     }
 
-    // 发送盘列表
-    ws.send(JSON.stringify({
+    // 发送盘列表（加密）
+    const disksMessage = JSON.stringify({
       type: 'disks_update',
       data: stockDisks.map(disk => ({
         id: disk.id,
@@ -51,13 +53,24 @@ function initWebSocket(server) {
         minStock: disk.minStock || null
       })),
       currentDiskId: currentDisk ? currentDisk.id : null
-    }))
+    });
+    ws.send('ENCRYPTED:' + encrypt(disksMessage));
 
     // 处理接收到的消息
     ws.on('message', (message) => {
       try {
-        const data = JSON.parse(message)
-        
+        let messageData = message.toString();
+        let data;
+
+        // 如果是加密的消息，先解密
+        if (messageData.startsWith('ENCRYPTED:')) {
+          const encryptedData = messageData.substring(10); // 移除 'ENCRYPTED:' 前缀
+          const decryptedData = decrypt(encryptedData);
+          data = JSON.parse(decryptedData);
+        } else {
+          data = JSON.parse(messageData);
+        }
+
         // 处理弹幕消息
         if (data.type === 'danmaku') {
           console.log('收到弹幕:', data.data)
@@ -73,13 +86,13 @@ function initWebSocket(server) {
             })
           }
         }
-        
+
         // 处理浏览器插件连接
         if (data.type === 'plugin_connected') {
           console.log('浏览器插件已连接:', data.source)
           ws.isPlugin = true
         }
-        
+
         // 处理AI分析结果
         if (data.type === 'ai_analysis_result') {
           console.log('收到AI分析结果:', data.result)
@@ -89,12 +102,12 @@ function initWebSocket(server) {
             data: data.result
           })
         }
-        
+
         // 处理AI分析错误
         if (data.type === 'ai_analysis_error') {
           console.error('AI分析错误:', data.error)
         }
-        
+
       } catch (error) {
         console.error('处理WebSocket消息失败:', error)
       }
@@ -116,9 +129,10 @@ function initWebSocket(server) {
  */
 function broadcast(message) {
   const data = JSON.stringify(message)
+  const encryptedData = 'ENCRYPTED:' + encrypt(data)
   clients.forEach(client => {
     if (client.readyState === 1) { // WebSocket.OPEN
-      client.send(data)
+      client.send(encryptedData)
     }
   })
 }
@@ -201,7 +215,7 @@ function broadcastDisksUpdate() {
  */
 function sendToPlugin(stockData) {
   const pluginClients = Array.from(clients).filter(client => client.isPlugin)
-  
+
   if (pluginClients.length > 0) {
     const message = JSON.stringify({
       type: 'stock_data_for_ai',
@@ -209,7 +223,7 @@ function sendToPlugin(stockData) {
       diskData: currentDisk ? currentDisk.data : [],
       diskId: currentDisk ? currentDisk.id : null
     })
-    
+
     pluginClients.forEach(client => {
       if (client.readyState === 1) {
         client.send(message)

@@ -7,6 +7,41 @@ import { ref, reactive, computed, onUnmounted } from 'vue';
 // API基础地址
 const API_BASE_URL = 'http://felinus.gnway.cc:8000';
 
+// 加密密钥
+const ENCRYPTION_KEY = 'stock-danmaku-secret-key-2024';
+
+/**
+ * 简单的XOR加密函数
+ */
+function encrypt(text: string): string {
+  let result = '';
+  for (let i = 0; i < text.length; i++) {
+    result += String.fromCharCode(
+      text.charCodeAt(i) ^ ENCRYPTION_KEY.charCodeAt(i % ENCRYPTION_KEY.length)
+    );
+  }
+  return btoa(encodeURIComponent(result));
+}
+
+/**
+ * 简单的XOR解密函数
+ */
+function decrypt(encoded: string): string {
+  try {
+    const text = decodeURIComponent(atob(encoded));
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+      result += String.fromCharCode(
+        text.charCodeAt(i) ^ ENCRYPTION_KEY.charCodeAt(i % ENCRYPTION_KEY.length)
+      );
+    }
+    return result;
+  } catch (error) {
+    console.error('解密失败:', error);
+    return '';
+  }
+}
+
 /**
  * 股票数据接口
  */
@@ -171,7 +206,19 @@ function connectWebSocket() {
 
   ws.onmessage = (event) => {
     try {
-      const message = JSON.parse(event.data);
+      // 尝试解密消息
+      let messageData = event.data;
+      let message;
+      
+      // 如果是加密的消息，先解密
+      if (typeof messageData === 'string' && messageData.startsWith('ENCRYPTED:')) {
+        const encryptedData = messageData.substring(10); // 移除 'ENCRYPTED:' 前缀
+        const decryptedData = decrypt(encryptedData);
+        message = JSON.parse(decryptedData);
+      } else {
+        message = JSON.parse(messageData);
+      }
+      
       handleWebSocketMessage(message);
     } catch (err) {
       console.error('解析WebSocket消息失败:', err);
@@ -590,10 +637,14 @@ function sendDanmaku(diskId: number, text: string) {
   
   // 通过WebSocket发送弹幕
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({
+    const message = JSON.stringify({
       type: 'danmaku',
       data: danmaku
-    }));
+    });
+    
+    // 加密消息
+    const encryptedMessage = 'ENCRYPTED:' + encrypt(message);
+    ws.send(encryptedMessage);
   }
   
   // 保存弹幕到localStorage

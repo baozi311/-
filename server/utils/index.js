@@ -3,6 +3,45 @@
  * 提供各种辅助函数，如时间格式化、数据验证、计算等
  */
 
+// 加密密钥
+const ENCRYPTION_KEY = 'stock-danmaku-secret-key-2024';
+
+/**
+ * 简单的XOR加密函数
+ * @param {string} text 要加密的文本
+ * @returns {string} 加密后的Base64字符串
+ */
+function encrypt(text) {
+  let result = '';
+  for (let i = 0; i < text.length; i++) {
+    result += String.fromCharCode(
+      text.charCodeAt(i) ^ ENCRYPTION_KEY.charCodeAt(i % ENCRYPTION_KEY.length)
+    );
+  }
+  return Buffer.from(encodeURIComponent(result)).toString('base64');
+}
+
+/**
+ * 简单的XOR解密函数
+ * @param {string} encoded 加密的Base64字符串
+ * @returns {string} 解密后的文本
+ */
+function decrypt(encoded) {
+  try {
+    const text = decodeURIComponent(Buffer.from(encoded, 'base64').toString());
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+      result += String.fromCharCode(
+        text.charCodeAt(i) ^ ENCRYPTION_KEY.charCodeAt(i % ENCRYPTION_KEY.length)
+      );
+    }
+    return result;
+  } catch (error) {
+    console.error('解密失败:', error);
+    return '';
+  }
+}
+
 /**
  * 格式化时间戳为可读字符串
  * @param {string|number} timestamp 时间戳
@@ -99,6 +138,8 @@ function getTimeDifferenceInMinutes(startTime, endTime) {
 
 // 导出模块
 export {
+  encrypt, // 加密函数
+  decrypt, // 解密函数
   formatTimestamp, // 格式化时间戳
   generateId, // 生成随机ID
   validateStockData, // 验证股票数据
