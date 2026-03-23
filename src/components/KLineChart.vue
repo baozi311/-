@@ -24,13 +24,13 @@
           <div class="ai-detail-item">
             <span class="label">预测价格</span>
             <span class="value">{{
-              toFixed4(aiAnalysisResult.nextPrice)
+              aiAnalysisResult.nextPrice !== null ? toFixed4(aiAnalysisResult.nextPrice) : '--'
             }}</span>
           </div>
           <div class="ai-detail-item">
-            <span class="label">预测趋势</span>
-            <span class="value" :class="aiAnalysisResult.trend">{{
-              aiAnalysisResult.trend == "上涨" ? "上涨" : "下跌"
+            <span class="label">预测股数</span>
+            <span class="value">{{
+              aiAnalysisResult.nextTotalStock !== null ? aiAnalysisResult.nextTotalStock : '--'
             }}</span>
           </div>
           <div class="ai-detail-item">

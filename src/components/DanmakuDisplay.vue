@@ -36,28 +36,28 @@ import {
  * 弹幕项接口
  */
 interface DanmakuItem {
-  id: number;               // 弹幕ID
-  text: string;             // 弹幕内容
-  top: number;              // 弹幕位置
-  duration: number;         // 弹幕持续时间
-  delay: number;            // 弹幕延迟时间
-  color: string;            // 弹幕颜色
-  count: number;            // 弹幕重复次数
-  height: number;           // 弹幕高度
+  id: number; // 弹幕ID
+  text: string; // 弹幕内容
+  top: number; // 弹幕位置
+  duration: number; // 弹幕持续时间
+  delay: number; // 弹幕延迟时间
+  color: string; // 弹幕颜色
+  count: number; // 弹幕重复次数
+  height: number; // 弹幕高度
 }
 
 /**
  * 组件属性接口
  */
 interface Props {
-  showDanmaku?: boolean;    // 是否显示弹幕
-  diskId?: number | null;    // 股票盘ID
+  showDanmaku?: boolean; // 是否显示弹幕
+  diskId?: number | null; // 股票盘ID
 }
 
 // 定义组件属性
 const props = withDefaults(defineProps<Props>(), {
-  showDanmaku: true,         // 默认显示弹幕
-  diskId: null,              // 默认盘ID为null
+  showDanmaku: true, // 默认显示弹幕
+  diskId: null, // 默认盘ID为null
 });
 
 // 显示的弹幕列表
@@ -72,7 +72,7 @@ const processedDanmakuIds = ref<Set<number>>(new Set());
  */
 function calculateDanmakuHeight(count: number): number {
   const fontSize = Math.min(18 + (count - 1) * 2, 30);
-  return fontSize * 1.4;
+  return fontSize * 1.2;
 }
 
 /**
@@ -106,10 +106,11 @@ function isPositionAvailable(top: number, height: number): boolean {
     const danmakuTop = danmaku.top;
     const danmakuBottom = danmakuTop + danmaku.height;
     const newBottom = top + height;
-    
+
     if (
       (top >= danmakuTop - buffer && top < danmakuBottom + buffer) ||
-      (newBottom > danmakuTop - buffer && newBottom <= danmakuBottom + buffer) ||
+      (newBottom > danmakuTop - buffer &&
+        newBottom <= danmakuBottom + buffer) ||
       (top <= danmakuTop - buffer && newBottom >= danmakuBottom + buffer)
     ) {
       return false;
@@ -126,14 +127,14 @@ function isPositionAvailable(top: number, height: number): boolean {
 function findAvailableTop(count: number): number {
   const height = calculateDanmakuHeight(count);
   const maxAttempts = 50;
-  
+
   for (let i = 0; i < maxAttempts; i++) {
     const top = Math.random() * (80 - height) + 5;
     if (isPositionAvailable(top, height)) {
       return top;
     }
   }
-  
+
   return Math.random() * 80 + 5;
 }
 
@@ -270,7 +271,10 @@ watch(
 
     // 找出新增的弹幕并按顺序显示
     const newDanmus = newDanmakuList.filter((storeDanmaku) => {
-      return !oldDanmakuIds.has(storeDanmaku.id) && !processedDanmakuIds.value.has(storeDanmaku.id);
+      return (
+        !oldDanmakuIds.has(storeDanmaku.id) &&
+        !processedDanmakuIds.value.has(storeDanmaku.id)
+      );
     });
 
     // 为新增的弹幕添加延迟，确保一个接一个显示

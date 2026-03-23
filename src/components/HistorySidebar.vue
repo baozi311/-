@@ -126,6 +126,7 @@ import {
   loadHistoryData,
   loadKlineData,
   loadDiskList,
+  loadDiskData,
   loadDiskKline,
   loadStockData,
 } from "../stores/stockStore";
@@ -275,6 +276,7 @@ async function selectDisk(diskId: number) {
   activeTab.value = "disk-" + diskId;
   selectedIndex.value = 0;
   emit("select-disk", diskId);
+  await loadDiskData(diskId);
   await loadDiskKline(diskId);
 }
 

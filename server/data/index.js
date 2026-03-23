@@ -170,6 +170,9 @@ function closeCurrentDisk() {
     console.log(`封存盘 #${currentDisk.id}, 最高价: ${stats.highPrice}, 最低价: ${stats.lowPrice}, 最多股: ${stats.maxStock}, 最少股: ${stats.minStock}`)
     saveData()
 
+    // 检查并清理旧数据，只保留最新的50个封存盘
+    checkAndClearOldData()
+
     return currentDisk
   }
   return null

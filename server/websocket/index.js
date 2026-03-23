@@ -3,11 +3,9 @@
  * 负责实时通信，处理WebSocket连接、消息和广播
  */
 
-import { WebSocketServer } from 'ws' // WebSocket服务器
-import { currentDisk, stockDisks, addDanmaku, danmakuData } from '../data/index.js' // 数据管理
-// import { analyzeStockData } from '../ai/index.js' // AI分析
+import { WebSocketServer } from 'ws'
+import { currentDisk, stockDisks, addDanmaku, danmakuData } from '../data/index.js'
 
-// 存储所有连接的客户端
 const clients = new Set()
 
 // WebSocket服务器实例
@@ -59,6 +57,8 @@ function initWebSocket(server) {
     ws.on('message', (message) => {
       try {
         const data = JSON.parse(message)
+        
+        // 处理弹幕消息
         if (data.type === 'danmaku') {
           console.log('收到弹幕:', data.data)
 
@@ -73,6 +73,28 @@ function initWebSocket(server) {
             })
           }
         }
+        
+        // 处理浏览器插件连接
+        if (data.type === 'plugin_connected') {
+          console.log('浏览器插件已连接:', data.source)
+          ws.isPlugin = true
+        }
+        
+        // 处理AI分析结果
+        if (data.type === 'ai_analysis_result') {
+          console.log('收到AI分析结果:', data.result)
+          // 广播AI分析结果给所有客户端
+          broadcast({
+            type: 'ai_analysis',
+            data: data.result
+          })
+        }
+        
+        // 处理AI分析错误
+        if (data.type === 'ai_analysis_error') {
+          console.error('AI分析错误:', data.error)
+        }
+        
       } catch (error) {
         console.error('处理WebSocket消息失败:', error)
       }
@@ -173,6 +195,30 @@ function broadcastDisksUpdate() {
   })
 }
 
+/**
+ * 发送股票数据给浏览器插件
+ * @param {Object} stockData 股票数据
+ */
+function sendToPlugin(stockData) {
+  const pluginClients = Array.from(clients).filter(client => client.isPlugin)
+  
+  if (pluginClients.length > 0) {
+    const message = JSON.stringify({
+      type: 'stock_data_for_ai',
+      stockData: stockData,
+      diskData: currentDisk ? currentDisk.data : [],
+      diskId: currentDisk ? currentDisk.id : null
+    })
+    
+    pluginClients.forEach(client => {
+      if (client.readyState === 1) {
+        client.send(message)
+        console.log('[WebSocket] 已发送股票数据给插件')
+      }
+    })
+  }
+}
+
 // 导出模块
 export {
   initWebSocket, // 初始化WebSocket服务器
@@ -181,5 +227,6 @@ export {
   broadcastDiskCreated, // 广播盘创建
   broadcastDiskClosed, // 广播盘关闭
   broadcastDisksUpdate, // 广播盘列表更新
+  sendToPlugin, // 发送数据给插件
   clients // 客户端集合
 }

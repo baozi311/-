@@ -24,10 +24,10 @@ interface StockData {
  * AI分析结果接口
  */
 interface AIAnalysisResult {
-  nextPrice: number;        // 预测的下一次股票价格
-  trend: 'up' | 'down';     // 预测趋势：上涨或下跌
-  accuracy: number;         // AI评估的准确率
-  timestamp: string;        // 分析时间戳
+  nextPrice: number | null;    // 预测的下一次股票价格
+  nextTotalStock: number | null; // 预测的下一次总股数
+  accuracy: number;            // AI评估的准确率
+  rawResponse?: string;        // 原始响应（解析失败时）
 }
 
 /**
@@ -196,6 +196,13 @@ function connectWebSocket() {
  */
 function handleWebSocketMessage(message: any) {
   switch (message.type) {
+    case 'ai_analysis':
+      // 处理AI分析结果（来自浏览器插件）
+      if (message.data) {
+        console.log('收到AI分析结果:', message.data);
+        aiAnalysisResult.value = message.data;
+      }
+      break;
     case 'stock_update':
       // 更新股票数据
       Object.assign(stockData, message.data);
@@ -225,10 +232,6 @@ function handleWebSocketMessage(message: any) {
             message.data.totalStock
           ]);
         }
-      }
-      // 处理AI分析结果
-      if (message.data && message.data.aiAnalysis) {
-        aiAnalysisResult.value = message.data.aiAnalysis;
       }
       break;
     case 'disks_update':

@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "DeepSeek AI Stock Analyzer",
+  "version": "1.0.0",
+  "description": "将股票数据发送到DeepSeek AI进行分析，并将结果返回给本地项目",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://chat.deepseek.com/*", "ws://localhost:3000/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://chat.deepseek.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
